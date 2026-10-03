@@ -23,7 +23,6 @@ export default function VideoPlayer({
       videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
     } else {
       videoRef.current.pause()
-      setIsPlaying(false)
     }
   }
 
@@ -39,13 +38,11 @@ export default function VideoPlayer({
         poster={posterSrc}
         preload="none"
         playsInline
-        controls={isPlaying}
         onEnded={() => setIsPlaying(false)}
         onPause={() => setIsPlaying(false)}
         className="video-element"
         aria-label={title}
       />
-
       {!isPlaying && (
         <button
           type="button"

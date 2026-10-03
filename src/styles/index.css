@@ -1031,8 +1031,8 @@ img, video {
   width: 100%;
   padding-top: clamp(3rem, 6vw, 5.5rem);
   padding-bottom: clamp(3rem, 6vw, 5.5rem);
-  background-color: var(--color-black-soft);
-  color: var(--color-off-white);
+  background-color: var(--color-off-white);
+  color: var(--color-black);
   overflow: hidden;
 }
 
@@ -1049,7 +1049,7 @@ img, video {
   font-size: clamp(1.75rem, 3.5vw, 3rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--color-off-white);
+  color: var(--color-black);
 }
 
 .media-rail-link {
@@ -1057,7 +1057,7 @@ img, video {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-off-white);
+  color: var(--color-black);
   text-decoration: underline;
   transition: color 0.2s ease;
 }
@@ -1130,7 +1130,7 @@ img, video {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background-color: rgba(10, 10, 10, 0.85);
+  background-color: var(--color-black-soft);
   color: var(--color-off-white);
   padding: 0.2rem 0.5rem;
 }
@@ -1144,7 +1144,7 @@ img, video {
 .media-rail-title {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--color-off-white);
+  color: var(--color-black);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1152,7 +1152,7 @@ img, video {
 
 .media-rail-subline {
   font-size: 0.75rem;
-  color: rgba(243, 240, 232, 0.55);
+  color: rgba(10, 10, 10, 0.55);
 }
 
 /* ==========================================================================
@@ -1244,38 +1244,38 @@ img, video {
 
 /* Narrative dark strip */
 .narrative-strip-section {
-  background-color: var(--color-black);
-  color: var(--color-off-white);
+  background-color: var(--color-off-white);
+  color: var(--color-black);
   padding-top: clamp(3.5rem, 7vw, 6.5rem);
   padding-bottom: clamp(3.5rem, 7vw, 6.5rem);
 }
 
 .narrative-strip-section .section-title {
-  color: var(--color-off-white);
+  color: var(--color-black);
 }
 
 .narrative-strip-section .section-kicker {
-  color: rgba(243, 240, 232, 0.6);
+  color: rgba(10, 10, 10, 0.6);
 }
 
 .narrative-strip-section .section-subtitle {
-  color: rgba(243, 240, 232, 0.7);
+  color: rgba(10, 10, 10, 0.7);
 }
 
 .narrative-strip-section .square-project-title {
-  color: var(--color-off-white);
+  color: var(--color-black);
 }
 
 .narrative-strip-section .square-project-line {
-  color: rgba(243, 240, 232, 0.7);
+  color: rgba(10, 10, 10, 0.7);
 }
 
 .narrative-strip-section .square-project-subline {
-  color: rgba(243, 240, 232, 0.55);
+  color: rgba(10, 10, 10, 0.55);
 }
 
 .narrative-strip-section .meta-separator {
-  color: rgba(243, 240, 232, 0.35);
+  color: rgba(10, 10, 10, 0.35);
 }
 
 /* ==========================================================================

@@ -2,11 +2,12 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 export const NAV_ITEMS = [
+  { label: 'HOME', path: '/' },
   { label: 'WORK', path: '/work' },
   { label: 'NARRATIVE', path: '/narrative' },
   { label: 'COMMERCIALS', path: '/commercials' },
   { label: 'MUSIC', path: '/music' },
-  { label: 'ON SET', path: '/on-set' },
+  { label: 'BTS', path: '/on-set' },
   { label: 'MENTORING', path: '/mentoring' },
   { label: 'ABOUT', path: '/about' },
   { label: 'CONTACT', path: '/contact' },
@@ -17,13 +18,13 @@ export default function Sidebar() {
 
   return (
     <aside className="desktop-sidebar" aria-label="Primary Desktop Navigation">
-      {/* Brand Wordmark Header */}
-      <div className="sidebar-brand-block">
-        <Link to="/" className="sidebar-brand-link" aria-label="FEDWORKS — Home">
-          <span className="sidebar-brand-name">FEDWORKS</span>
-        </Link>
-        <div className="sidebar-brand-sub">DIRECTOR OF PHOTOGRAPHY</div>
-      </div>
+       {/* Brand Wordmark Header */}
+       <div className="sidebar-brand-block">
+         <Link to="/" className="sidebar-brand-link" aria-label="FEDWORKS — Home">
+           <span className="sidebar-brand-name">Chukwuka Edeogu (Fedworks)</span>
+         </Link>
+         <div className="sidebar-brand-sub">DIRECTOR OF PHOTOGRAPHY</div>
+       </div>
 
       {/* Persistent Navigation List */}
       <nav className="sidebar-nav-container">

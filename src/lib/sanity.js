@@ -417,25 +417,27 @@ export function normalizeProject(raw) {
   // Location
   const location = raw.location || ''
 
-  // Date / Year
-  let dateFormatted = ''
-  let year = ''
-  if (raw.date) {
-    const parts = String(raw.date).split('-')
-    if (parts.length >= 2) {
-      dateFormatted = `${parts[1]}.${parts[0]}`
-      year = parts[0]
-    } else {
-      dateFormatted = String(raw.date)
-      year = String(raw.date)
-    }
-  } else if (raw.monthYear) {
-    dateFormatted = raw.monthYear
-    year = raw.year ? String(raw.year) : ''
-  } else if (raw.year) {
-    dateFormatted = String(raw.year)
-    year = String(raw.year)
-  }
+   // Date / Year
+   let dateFormatted = ''
+   let year = ''
+   if (raw.date) {
+     const parts = String(raw.date).split('-')
+     if (parts.length >= 2) {
+       const monthIndex = parseInt(parts[1], 10) - 1
+       const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+       dateFormatted = `${monthNames[monthIndex]} ${parts[0]}`
+       year = parts[0]
+     } else {
+       dateFormatted = String(raw.date)
+       year = String(raw.date)
+     }
+   } else if (raw.monthYear) {
+     dateFormatted = raw.monthYear
+     year = raw.year ? String(raw.year) : ''
+   } else if (raw.year) {
+     dateFormatted = String(raw.year)
+     year = String(raw.year)
+   }
 
   const descText = extractText(raw.description)
 

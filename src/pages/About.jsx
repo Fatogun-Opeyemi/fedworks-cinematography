@@ -27,11 +27,11 @@ export default function About() {
 
         <div className="editorial-split" style={{ marginTop: '3.5rem' }}>
           <div>
-            <Reveal>
-              <div style={{ fontSize: 'clamp(2rem, 4vw, 3.25rem)', fontWeight: 700, lineHeight: 1.15, marginBottom: '2rem', letterSpacing: '-0.02em' }}>
-                <div>FEDWORKS</div>
-                <div style={{ color: 'var(--color-red)' }}>DIRECTOR OF PHOTOGRAPHY</div>
-              </div>
+             <Reveal>
+               <div style={{ fontSize: 'clamp(2rem, 4vw, 3.25rem)', fontWeight: 700, lineHeight: 1.15, marginBottom: '2rem', letterSpacing: '-0.02em' }}>
+                 <div>Chukwuka Edeogu (Fedworks)</div>
+                 <div style={{ color: 'var(--color-red)' }}>DIRECTOR OF PHOTOGRAPHY</div>
+               </div>
 
               <div style={{ fontSize: 'clamp(1rem, 1.35vw, 1.2rem)', fontWeight: 300, lineHeight: 1.75, color: 'rgba(243, 240, 232, 0.85)', maxWidth: '58ch' }}>
                 <p style={{ marginBottom: '1.5rem' }}>

@@ -9,26 +9,19 @@ export default function Footer() {
           {/* Identity */}
           <div className="minimal-footer-brand">
             <Link to="/" className="minimal-footer-title">
-              FEDWORKS
+              Chukwuka Edeogu (Fedworks)
             </Link>
             <div className="minimal-footer-subtitle">
               DIRECTOR OF PHOTOGRAPHY
             </div>
           </div>
 
-          {/* Direct Inquiry Link */}
-          <div className="minimal-footer-action">
-            <Link to="/contact" className="minimal-footer-contact-link">
-              Contact / Inquiry →
-            </Link>
-          </div>
-
           {/* Copyright */}
           <div className="minimal-footer-copy tabular-nums">
-            © {new Date().getFullYear()} FEDWORKS
+            © {new Date().getFullYear()} Chukwuka Edeogu (Fedworks)
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

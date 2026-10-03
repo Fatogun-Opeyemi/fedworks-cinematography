@@ -69,18 +69,18 @@ export default function HeroReel({
       <div className="hero-reel-content">
         <div className="site-container">
           <div className="hero-reel-grid">
-            {/* Exactly ONE FEDWORKS + DIRECTOR OF PHOTOGRAPHY close together */}
-            <Reveal delay={0.05}>
-              <div className="hero-identity-lockup">
-                <h1 className="hero-identity-title">
-                  FEDWORKS
-                </h1>
-                <div className="hero-identity-role">
-                  <span className="role-accent-dot" aria-hidden="true" />
-                  <span className="role-text">DIRECTOR OF PHOTOGRAPHY</span>
-                </div>
-              </div>
-            </Reveal>
+             {/* Exactly ONE FEDWORKS + DIRECTOR OF PHOTOGRAPHY close together */}
+             <Reveal delay={0.05}>
+               <div className="hero-identity-lockup">
+                 <h1 className="hero-identity-title">
+                   Chukwuka Edeogu (Fedworks)
+                 </h1>
+                 <div className="hero-identity-role">
+                   <span className="role-accent-dot" aria-hidden="true" />
+                   <span className="role-text">DIRECTOR OF PHOTOGRAPHY</span>
+                 </div>
+               </div>
+             </Reveal>
 
             {/* Controls share one aligned row with the identity lockup */}
             <div className="hero-controls-cluster">

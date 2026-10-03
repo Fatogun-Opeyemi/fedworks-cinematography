@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 
@@ -13,6 +13,9 @@ export default function MediaViewer({
   caption = '',
 }) {
   const closeButtonRef = useRef(null)
+  const videoRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -36,6 +39,43 @@ export default function MediaViewer({
   }, [isOpen, onClose])
 
   if (!isOpen) return null
+
+  // Update video state when mediaSrc changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.src = mediaSrc || ''
+      videoRef.current.poster = posterSrc || ''
+      // Reset play state when media changes? We'll keep it as is.
+    }
+  }, [mediaSrc, posterSrc])
+
+  // Handle video ended
+  useEffect(() => {
+    if (videoRef.current) {
+      const handleEnded = () => {
+        setIsPlaying(false)
+      }
+      videoRef.current.addEventListener('ended', handleEnded)
+      return () => {
+        videoRef.current.removeEventListener('ended', handleEnded)
+      }
+    }
+  }, [])
+
+  const togglePlay = () => {
+    if (!videoRef.current) return
+    if (videoRef.current.paused) {
+      videoRef.current.play()
+    } else {
+      videoRef.current.pause()
+    }
+  }
+
+  const toggleMute = () => {
+    if (!videoRef.current) return
+    videoRef.current.muted = !videoRef.current.muted
+    setIsMuted(videoRef.current.muted)
+  }
 
   return createPortal(
     <AnimatePresence>
@@ -121,14 +161,132 @@ export default function MediaViewer({
             }}
           >
             {mediaType === 'video' ? (
-              <video
-                src={mediaSrc}
-                poster={posterSrc}
-                controls
-                playsInline
-                autoPlay
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
+              <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+                <video
+                  ref={videoRef}
+                  src={mediaSrc}
+                  poster={posterSrc}
+                  playsInline
+                  autoPlay
+                  loop
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+                {/* Controls Overlay */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '12px',
+                    padding: '0 12px',
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    // We'll show controls always in fullscreen for simplicity
+                    opacity: 1,
+                  }}
+                >
+                  {/* Play/Pause Button */}
+                  <button
+                    onClick={togglePlay}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'var(--color-off-white)',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isPlaying ? (
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect x="6" y="4" width="4" height="16" />
+                        <rect x="14" y="4" width="4" height="16" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg>
+                    )}
+                  </button>
+                  {/* Mute/Unmute Button */}
+                  <button
+                    onClick={toggleMute}
+                    aria-label={isMuted ? 'Unmute' : 'Mute'}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      color: 'var(--color-off-white)',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isMuted ? (
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <line x1="23" y1="9" x2="17" y2="15" />
+                        <line x1="17" y1="9" x2="23" y2="15" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
             ) : (
               <img
                 src={mediaSrc}

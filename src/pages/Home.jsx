@@ -75,11 +75,11 @@ export default function Home() {
       <section className="selected-work-section">
         <div className="site-container">
           <div className="section-header-row-layout">
-            <SectionHeader
-              kicker="Featured Works"
-              title="Director of Photography"
-              subtitle="Cinematography commissions across narrative drama, commercials, and music films."
-            />
+             <SectionHeader
+               kicker=""
+               title="Featured Works"
+               subtitle="Cinematography commissions across narrative drama, commercials, and music films."
+             />
             <Link to="/work" className="section-action-link">
               View All Work
             </Link>
@@ -210,34 +210,34 @@ export default function Home() {
       {/* ==================================================================
           7. BEHIND THE SCENES / ON SET RAIL
           ================================================================== */}
-      {btsItems.length > 0 && (
-        <MediaRail
-          items={btsItems.map(item => ({
-            ...item,
-            title: item.caption,
-            posterUrl: item.image?.asset?.url,
-            videoUrl: item.video?.asset?.url,
-            categoryLabel: 'On Set',
-          }))}
-          title="On Set & Camera Rigs"
-          kicker="Behind The Scenes"
-          seeAllLink="/on-set"
-          seeAllText="All BTS Material →"
-        />
-      )}
+       {btsItems.length > 0 && (
+         <MediaRail
+           items={btsItems.map(item => ({
+             ...item,
+             title: item.caption,
+             posterUrl: item.image?.asset?.url,
+             videoUrl: item.video?.asset?.url,
+             categoryLabel: 'BTS',
+           }))}
+           title="BTS & Camera Rigs"
+           kicker="Behind The Scenes"
+           seeAllLink="/on-set"
+           seeAllText="All BTS Material →"
+         />
+       )}
 
       {/* Full-Screen Showreel Modal */}
-      {heroVideoUrl && (
-        <MediaViewer
-          isOpen={isViewerOpen}
-          onClose={() => setIsViewerOpen(false)}
-          mediaType="video"
-          mediaSrc={heroVideoUrl}
-          posterSrc={heroPosterUrl}
-          title="FEDWORKS — Showreel"
-          caption="Director of Photography portfolio reel."
-        />
-      )}
+       {heroVideoUrl && (
+         <MediaViewer
+           isOpen={isViewerOpen}
+           onClose={() => setIsViewerOpen(false)}
+           mediaType="video"
+           mediaSrc={heroVideoUrl}
+           posterSrc={heroPosterUrl}
+           title="Chukwuka Edeogu (Fedworks) — Showreel"
+           caption="Portfolio reel."
+         />
+       )}
     </div>
   )
 }
