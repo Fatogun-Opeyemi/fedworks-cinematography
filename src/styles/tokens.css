@@ -1,0 +1,105 @@
+/* ==========================================================================
+   FEDWORKS — DESIGN TOKENS
+   Governed strictly by AGENTS.md
+   ========================================================================== */
+
+/* Local font-face declarations strictly from src/assets/fonts/Ranade/ */
+@font-face {
+  font-family: 'Ranade';
+  src: url('/src/assets/fonts/Ranade/Ranade-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ranade';
+  src: url('/src/assets/fonts/Ranade/Ranade-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ranade';
+  src: url('/src/assets/fonts/Ranade/Ranade-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ranade';
+  src: url('/src/assets/fonts/Ranade/Ranade-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Exact Design System Palette */
+  --color-off-white: #F3F0E8;
+  --color-black: #0A0A0A;
+  --color-black-soft: #151515;
+  --color-red: #9E2F2B;
+
+  /* Typography */
+  --font-family: 'Ranade', sans-serif;
+  --font-display: 'Ranade', sans-serif;
+  --font-body: 'Ranade', sans-serif;
+  --font-meta: 'Ranade', sans-serif;
+
+  /* Layout Boundaries & Responsive Gutters */
+  --max-content-width: 1600px;
+  --site-gutter: 18px;
+
+  /* Persistent Navigation Shell */
+  --sidebar-width: 264px;
+  --mobile-header-height: 60px;
+
+  /* Spacing Scale */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+  --space-4xl: 128px;
+
+  /* Typographic Scale */
+  --type-display-hero: clamp(2.5rem, 6.5vw, 6rem);
+  --type-display-section: clamp(2rem, 4.5vw, 3.75rem);
+  --type-display-card: clamp(1.25rem, 2vw, 1.75rem);
+  --type-body-lead: clamp(1.1rem, 1.5vw, 1.35rem);
+  --type-body-regular: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  --type-body-small: 0.875rem;
+  --type-meta: 0.75rem;
+  --type-meta-micro: 0.6875rem;
+
+  /* Subtle Lines */
+  --border-light: rgba(10, 10, 10, 0.12);
+  --border-dark: rgba(243, 240, 232, 0.12);
+  --border-light-strong: rgba(10, 10, 10, 0.25);
+  --border-dark-strong: rgba(243, 240, 232, 0.25);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --site-gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --site-gutter: 32px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --site-gutter: 40px;
+    --sidebar-width: 288px;
+  }
+}

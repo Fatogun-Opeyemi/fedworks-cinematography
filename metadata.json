@@ -1,0 +1,6 @@
+{
+  "name": "Fedworks",
+  "description": "Minimalist architectural, spatial design, and editorial creative studio portfolio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

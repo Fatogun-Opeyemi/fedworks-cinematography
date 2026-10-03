@@ -1,0 +1,22 @@
+{
+  "name": "fedworks-sanity",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy"
+  },
+  "keywords": ["sanity"],
+  "dependencies": {
+    "@sanity/client": "^6.28.3",
+    "@sanity/image-url": "^1.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sanity": "^3.77.2",
+    "styled-components": "^6.1.15"
+  }
+}
