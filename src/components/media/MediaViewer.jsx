@@ -17,6 +17,25 @@ export default function MediaViewer({
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
 
+  const togglePlay = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (video.paused) {
+      video.play().catch(() => { })
+    } else {
+      video.pause()
+    }
+  }
+
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = !video.muted
+    setIsMuted(video.muted)
+  }
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -38,18 +57,13 @@ export default function MediaViewer({
     }
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
-
-  // Update video state when mediaSrc changes
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.src = mediaSrc || ''
       videoRef.current.poster = posterSrc || ''
-      // Reset play state when media changes? We'll keep it as is.
     }
   }, [mediaSrc, posterSrc])
 
-  // Handle video ended
   useEffect(() => {
     if (videoRef.current) {
       const handleEnded = () => {
@@ -62,19 +76,8 @@ export default function MediaViewer({
     }
   }, [])
 
-  const togglePlay = () => {
-    if (!videoRef.current) return
-    if (videoRef.current.paused) {
-      videoRef.current.play()
-    } else {
-      videoRef.current.pause()
-    }
-  }
-
-  const toggleMute = () => {
-    if (!videoRef.current) return
-    videoRef.current.muted = !videoRef.current.muted
-    setIsMuted(videoRef.current.muted)
+  if (!isOpen) {
+    return null
   }
 
   return createPortal(
