@@ -20,7 +20,6 @@ export const sanityConfig = {
   apiVersion: env.VITE_SANITY_API_VERSION || '2024-03-01',
   useCdn: false, // Ensure fresh published data
   // In the browser, proxy via Vite dev server to bypass Sanity CORS 403
-  ...(isBrowser ? { apiHost: `${window.location.origin}/api/sanity`, useProjectHostname: false } : {}),
 }
 
 export const client = createClient(sanityConfig)
@@ -121,7 +120,7 @@ async function safeFetch(query, params = {}) {
         const json = await res.json()
         return json.result
       }
-    } catch {}
+    } catch { }
     console.warn('[Sanity API] Query warning:', err.message)
     return null
   }
@@ -629,7 +628,7 @@ export async function getBtsItems() {
     const query = `*[_type == "btsItem" && published != false] | order(_createdAt desc)`
     const data = await safeFetch(query)
     if (Array.isArray(data) && data.length > 0) return data
-  } catch {}
+  } catch { }
 
   // 2. Derive BTS items from project media
   try {
@@ -651,7 +650,7 @@ export async function getBtsItems() {
       }
     }
     return btsList
-  } catch {}
+  } catch { }
 
   return []
 }
