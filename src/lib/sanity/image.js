@@ -1,10 +1,10 @@
-import imageUrlBuilder from '@sanity/image-url'
+import { createImageUrlBuilder } from '@sanity/image-url'
 import { client } from './client.js'
 
 let builder = null
 if (client) {
   try {
-    builder = imageUrlBuilder(client)
+    builder = createImageUrlBuilder(client)
   } catch {
     builder = null
   }

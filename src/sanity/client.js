@@ -5,7 +5,7 @@ import { createImageUrlBuilder } from '@sanity/image-url'
 // Environment-driven Sanity configuration (no secrets exposed)
 export const sanityConfig = {
   // projectId: import.meta.env.VITE_SANITY_PROJECT_ID || 'fedworks-studio',
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || '1qg7m6y2',
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || '4t9t903j',
   dataset: import.meta.env.VITE_SANITY_DATASET || 'production',
   // apiVersion: import.meta.env.VITE_SANITY_API_VERSION || '2024-03-01',
   apiVersion: import.meta.env.VITE_SANITY_API_VERSION || '2026-10-03',
@@ -128,7 +128,7 @@ export const placeholderProjects = [
     _type: 'project',
     title: 'PLACEHOLDER PROJECT 05',
     slug: { current: 'placeholder-project-05' },
-    category: 'on-set',
+    category: 'onset',
     categoryLabel: 'On Set / BTS',
     year: '2024',
     poster: '/src/assets/images/project_editorial_monograph_1790959685078.jpg',

@@ -1,232 +1,392 @@
-import React, { useRef, useState, useEffect } from 'react'
+
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { videoCoordinator } from './videoCoordinator.js'
 import Reveal from '../Reveal.jsx'
+import VideoPlayer from './VideoPlayer.jsx'
+import MediaViewer from './MediaViewer.jsx'
 
-export default function MediaSquareCard({ project, delay = 0 }) {
-  const videoRef = useRef(null)
+import {
+  urlForRect,
+  getFileUrl,
+  getCategoryLabel,
+  formatProjectDate,
+} from '../../libs/sanity.js'
+
+export default function MediaSquareCard({
+  project,
+  delay = 0,
+  hideCategoryTag = false,
+  showOnlyTitle = false,
+  showCategory = true,
+  showMetadata = true,
+}) {
   const containerRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(true)
-  const [isHovered, setIsHovered] = useState(false)
+  const videoRef = useRef(null)
 
-  const hasVideo = Boolean(project.videoUrl)
-  const posterUrl = project.posterUrl || project.poster || project.thumbnailUrl || project.thumbnail || ''
+  const [videoActive, setVideoActive] = useState(false)
+  const [isBtsViewerOpen, setIsBtsViewerOpen] = useState(false)
 
-  // Register with global video coordinator
-  useEffect(() => {
-    const videoEl = videoRef.current
-    if (videoEl) {
-      videoCoordinator.register(videoEl)
+  const slug =
+    typeof project?.slug === 'string'
+      ? project.slug
+      : project?.slug?.current
+
+  /*
+   * Cover media
+   */
+  const coverMedia = project?.coverMedia || null
+
+  const hasVideo =
+    coverMedia?.type === 'video' &&
+    Boolean(coverMedia?.video)
+
+  const videoUrl = hasVideo
+    ? getFileUrl(coverMedia.video)
+    : null
+
+  const posterUrl =
+    coverMedia?.type === 'video'
+      ? coverMedia?.poster
+        ? urlForRect(coverMedia.poster)
+        : ''
+      : coverMedia?.type === 'image'
+        ? coverMedia?.image
+          ? urlForRect(coverMedia.image)
+          : ''
+        : ''
+
+  /*
+   * Project metadata
+   */
+  const categories = Array.isArray(project?.categories)
+    ? project.categories
+    : []
+
+  const isBts = categories.some(
+    (category) =>
+      String(category).toLowerCase() === 'bts',
+  )
+
+  const categoryLabel =
+    categories.length > 0
+      ? categories
+        .map((category) => getCategoryLabel(category))
+        .join(' · ')
+      : ''
+
+  const dateFormatted = formatProjectDate(
+    project?.month,
+    project?.year,
+  )
+
+  /*
+   * BTS media viewer
+   */
+  const openBtsViewer = () => {
+    if (isBts && (videoUrl || posterUrl)) {
+      setIsBtsViewerOpen(true)
     }
-    return () => {
-      if (videoEl) videoCoordinator.unregister(videoEl)
-    }
-  }, [hasVideo])
+  }
 
-  // Pause video automatically when leaving viewport
+  /*
+   * Pause active video when card leaves viewport
+   */
   useEffect(() => {
-    if (!hasVideo) return
+    if (!hasVideo || !videoActive) return
+
     const container = containerRef.current
-    if (!container) return
+    const video = videoRef.current
+
+    if (!container || !video) return
 
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting && videoRef.current && !videoRef.current.paused) {
-            videoRef.current.pause()
-            setIsPlaying(false)
-          }
-        })
+      ([entry]) => {
+        if (!entry.isIntersecting && !video.paused) {
+          video.pause()
+        }
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     )
 
     observer.observe(container)
+
     return () => observer.disconnect()
-  }, [hasVideo])
+  }, [hasVideo, videoActive])
 
-  const togglePlay = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+  if (!project) return null
+  if (!slug && !isBts) return null
 
-    const videoEl = videoRef.current
-    if (!videoEl) return
+  const activateVideo = () => {
+    if (!videoUrl) return
 
-    if (videoEl.paused) {
-      videoCoordinator.notifyPlay(videoEl)
-      videoEl
-        .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false))
-    } else {
-      videoEl.pause()
-      setIsPlaying(false)
+    if (isBts) {
+      openBtsViewer()
+      return
     }
+
+    setVideoActive(true)
   }
 
-  const toggleSound = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+  /*
+   * Media content
+   */
+  let mediaContent
 
-    const videoEl = videoRef.current
-    if (!videoEl) return
-
-    const nextMuted = !videoEl.muted
-    videoEl.muted = nextMuted
-    setIsMuted(nextMuted)
-  }
-
-  return (
-    <Reveal delay={delay}>
-      <article
-        ref={containerRef}
-        className="media-square-card"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* Uniform 1:1 Aspect Ratio Media Container */}
-        <div
-          className="square-media-box"
-          onClick={hasVideo ? togglePlay : undefined}
-          style={{ cursor: hasVideo ? 'pointer' : 'default' }}
+  if (hasVideo && videoUrl) {
+    if (videoActive) {
+      mediaContent = (
+        <VideoPlayer
+          ref={videoRef}
+          videoSrc={videoUrl}
+          posterSrc={posterUrl}
+          aspectRatio="3/2"
+          title={project.title || 'Project video'}
+          controls
+          playsInline
+          preload="none"
+          autoPlay
+        />
+      )
+    } else {
+      mediaContent = (
+        <button
+          type="button"
+          className="square-video-poster"
+          onClick={activateVideo}
+          aria-label={
+            isBts
+              ? `View ${project.title || 'behind the scenes'}`
+              : `Play ${project.title || 'project video'}`
+          }
         >
-          {/* Real Cover Image (Displayed when idle or paused) */}
           {posterUrl ? (
             <img
               src={posterUrl}
-              alt={project.title}
+              alt={
+                coverMedia?.alt ||
+                project.title ||
+                'Project'
+              }
               loading="lazy"
+              decoding="async"
               referrerPolicy="no-referrer"
               className="square-media-asset"
-              style={{
-                display: isPlaying ? 'none' : 'block',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
             />
           ) : (
-            <div
-              className="square-media-asset"
-              style={{
-                display: isPlaying ? 'none' : 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'var(--color-black-soft)',
-                color: 'rgba(243, 240, 232, 0.4)',
-                fontSize: '0.75rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-              }}
+            <span className="square-image-placeholder">
+              <span>{project.title || 'Project'}</span>
+            </span>
+          )}
+
+          <span
+            className="square-video-play"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
             >
-              {project.title}
-            </div>
-          )}
+              <path
+                d="M9 6.5L18 12L9 17.5V6.5Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
+        </button>
+      )
+    }
+  } else if (posterUrl) {
+    if (isBts) {
+      mediaContent = (
+        <button
+          type="button"
+          className="square-image-link bts-media-trigger"
+          onClick={openBtsViewer}
+          aria-label={`View ${project.title || 'BTS media'}`}
+        >
+          <img
+            src={posterUrl}
+            alt={
+              coverMedia?.alt ||
+              project.title ||
+              'Project'
+            }
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="square-media-asset"
+          />
+        </button>
+      )
+    } else {
+      mediaContent = (
+        <Link
+          to={`/work/${slug}`}
+          className="square-image-link"
+          aria-label={`View ${project.title || 'project'}`}
+        >
+          <img
+            src={posterUrl}
+            alt={
+              coverMedia?.alt ||
+              project.title ||
+              'Project'
+            }
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            className="square-media-asset"
+          />
+        </Link>
+      )
+    }
+  } else {
+    if (isBts) {
+      mediaContent = (
+        <div className="square-image-placeholder">
+          <span>{project.title || 'Project'}</span>
+        </div>
+      )
+    } else {
+      mediaContent = (
+        <Link
+          to={`/work/${slug}`}
+          className="square-image-placeholder"
+          aria-label={`View ${project.title || 'project'}`}
+        >
+          <span>{project.title || 'Project'}</span>
+        </Link>
+      )
+    }
+  }
 
-          {/* In-page Video Player (Active when playing) */}
-          {hasVideo && (
-            <video
-              ref={videoRef}
-              src={project.videoUrl}
-              poster={posterUrl}
-              preload="none"
-              playsInline
-              muted={isMuted}
-              loop
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              className="square-media-asset"
-              style={{
-                display: isPlaying ? 'block' : 'none',
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-              aria-label={`${project.title} video`}
-            />
-          )}
+  /*
+   * Render
+   */
+  return (
+    <>
+      <style>{`
+        .bts-media-trigger {
+          display: block;
+          width: 100%;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          cursor: pointer;
+          text-align: inherit;
+          font: inherit;
+          appearance: none;
+          -webkit-appearance: none;
+        }
 
-          {/* Controls overlay for video cards */}
-          {hasVideo && (
-            <div className="square-media-controls" onClick={(e) => e.stopPropagation()}>
-              {/* Play / Pause Toggle Button */}
-              <button
-                type="button"
-                onClick={togglePlay}
-                className="square-ctrl-btn"
-                aria-label={isPlaying ? `Pause ${project.title}` : `Play ${project.title}`}
-              >
-                {isPlaying ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="4" height="16" />
-                    <rect x="14" y="4" width="4" height="16" />
-                  </svg>
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <polygon points="6 3 20 12 6 21 6 3" />
-                  </svg>
-                )}
-              </button>
+        .bts-media-trigger img {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
 
-              {/* Volume / Sound Toggle Button */}
-              {isPlaying && (
-                <button
-                  type="button"
-                  onClick={toggleSound}
-                  className="square-ctrl-btn"
-                  aria-label={isMuted ? 'Turn sound on' : 'Turn sound off'}
-                >
-                  {isMuted ? (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      <line x1="23" y1="9" x2="17" y2="15" />
-                      <line x1="17" y1="9" x2="23" y2="15" />
-                    </svg>
+        .bts-media-trigger:focus-visible {
+          outline: 2px solid currentColor;
+          outline-offset: 4px;
+        }
+      `}</style>
+
+      <Reveal delay={delay}>
+        <article
+          ref={containerRef}
+          className="media-square-card"
+        >
+          <div className="square-media-box">
+            {mediaContent}
+
+            {showMetadata &&
+              showCategory &&
+              !hideCategoryTag &&
+              categoryLabel && (
+                <div className="square-category-tag">
+                  {categoryLabel}
+                </div>
+              )}
+          </div>
+
+          {showMetadata && (
+            <div className="square-meta-box">
+              {showOnlyTitle ? (
+                <h3 className="square-project-title">
+                  {isBts ? (
+                    project.title
                   ) : (
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                    </svg>
+                    <Link to={`/work/${slug}`}>
+                      {project.title}
+                    </Link>
                   )}
-                </button>
+                </h3>
+              ) : (
+                <>
+                  <h3 className="square-project-title">
+                    {isBts ? (
+                      project.title
+                    ) : (
+                      <Link to={`/work/${slug}`}>
+                        {project.title}
+                      </Link>
+                    )}
+                  </h3>
+
+                  <div className="square-project-line">
+                    {showCategory && categoryLabel}
+
+                    {showCategory &&
+                      categoryLabel &&
+                      project.clientOrArtist && (
+                        <span className="meta-separator">
+                          ·
+                        </span>
+                      )}
+
+                    {project.clientOrArtist && (
+                      <span>{project.clientOrArtist}</span>
+                    )}
+                  </div>
+
+                  <div className="square-project-subline tabular-nums">
+                    {project.location && (
+                      <span>{project.location}</span>
+                    )}
+
+                    {project.location &&
+                      dateFormatted && (
+                        <span className="meta-separator">
+                          ·
+                        </span>
+                      )}
+
+                    {dateFormatted && (
+                      <span>{dateFormatted}</span>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           )}
+        </article>
+      </Reveal>
 
-          {/* Category Tag Overlay */}
-          <div className="square-category-tag">
-            {project.categoryLabel || project.category}
-          </div>
-        </div>
-
-        {/* Concise Production Metadata */}
-        <div className="square-meta-box">
-          <h3 className="square-project-title">
-            <Link to={`/work/${project.slug?.current || project.slug}`}>
-              {project.title}
-            </Link>
-          </h3>
-
-          <div className="square-project-line">
-            <span>{project.categoryLabel || project.category}</span>
-            {project.clientOrArtist && (
-              <>
-                <span className="meta-separator">·</span>
-                <span>{project.clientOrArtist}</span>
-              </>
-            )}
-          </div>
-
-          <div className="square-project-subline tabular-nums">
-            {project.location && <span>{project.location}</span>}
-            {project.location && project.dateFormatted && (
-              <span className="meta-separator">·</span>
-            )}
-            {project.dateFormatted && <span>{project.dateFormatted}</span>}
-          </div>
-        </div>
-      </article>
-    </Reveal>
+      {isBts && (
+        <MediaViewer
+          isOpen={isBtsViewerOpen}
+          onClose={() => setIsBtsViewerOpen(false)}
+          mediaType={hasVideo ? 'video' : 'image'}
+          mediaSrc={hasVideo ? videoUrl : posterUrl}
+          posterSrc={posterUrl}
+          title={project.title || 'Behind the scenes'}
+          caption="Behind the scenes"
+          showControls={hasVideo}
+        />
+      )}
+    </>
   )
 }

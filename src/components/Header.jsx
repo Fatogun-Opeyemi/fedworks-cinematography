@@ -19,7 +19,7 @@ export default function Header({
         <div className="top-bar-inner">
           {/* Zone 1: Single text element wordmark with muted oxblood dot */}
           <a href="#" className="brand-wordmark" aria-label="Fedworks Studio Home">
-            FEDWORKx
+            FEDWORK
             <span className="brand-dot" aria-hidden="true" />
           </a>
 

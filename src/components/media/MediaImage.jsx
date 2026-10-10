@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { urlForImage } from '../../lib/sanity/image.js'
+import { urlFor } from '../../libs/sanity.js'
 
 export default function MediaImage({
   image,
@@ -10,11 +10,25 @@ export default function MediaImage({
   loading = 'lazy',
   priority = false,
   style = {},
+  width = 1600,
+  quality = 82,
+  sizes = '100vw',
 }) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const resolvedSrc = src || (image ? urlForImage(image) : '') || '/placeholders/placeholder-01.svg'
+  const transformedImageUrl = image
+    ? urlFor(image)
+      ?.width(width)
+      .quality(quality)
+      .auto('format')
+      .url()
+    : ''
+
+  const resolvedSrc =
+    src ||
+    transformedImageUrl ||
+    '/placeholders/placeholder-01.svg'
 
   return (
     <div
@@ -32,6 +46,9 @@ export default function MediaImage({
           src={resolvedSrc}
           alt={alt}
           loading={priority ? 'eager' : loading}
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'auto'}
+          sizes={sizes}
           referrerPolicy="no-referrer"
           onLoad={() => setIsLoaded(true)}
           onError={() => setHasError(true)}
@@ -40,7 +57,8 @@ export default function MediaImage({
             height: '100%',
             objectFit: 'cover',
             opacity: isLoaded ? 1 : 0.2,
-            transition: 'opacity 0.4s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition:
+              'opacity 0.4s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         />
       )}

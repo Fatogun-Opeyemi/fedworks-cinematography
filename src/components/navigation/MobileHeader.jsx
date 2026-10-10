@@ -16,7 +16,7 @@ export default function MobileHeader() {
             className="mobile-header-brand"
             aria-label="FEDWORKS — Home"
           >
-            FEDWORKS
+            Chukwuka Edeogu
           </Link>
 
           <button
@@ -26,7 +26,7 @@ export default function MobileHeader() {
             aria-label="Open mobile navigation menu"
             aria-expanded={isMenuOpen}
           >
-            <span className="mobile-hamburger-text">MENU</span>
+            {/* <span className="mobile-hamburger-text"></span> */}
             <span className="mobile-hamburger-icon" aria-hidden="true">
               <span className="mobile-hamburger-line" />
               <span className="mobile-hamburger-line" />

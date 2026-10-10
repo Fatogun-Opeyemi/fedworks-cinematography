@@ -410,7 +410,7 @@ export default function Contact() {
                     <div
                       style={{
                         fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-                        fontWeight: 700,
+                        fontWeight: 400,
                         lineHeight: 1,
                         letterSpacing: '-0.04em',
                         textTransform: 'uppercase',

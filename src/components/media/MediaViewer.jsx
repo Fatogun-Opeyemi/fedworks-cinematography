@@ -1,329 +1,315 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'motion/react'
+// import React, { useEffect } from 'react'
+// import { motion, AnimatePresence } from 'motion/react'
+
+// export default function MediaViewer({ isOpen, onClose, mediaSrc, mediaAlt, title, caption }) {
+//   useEffect(() => {
+//     const handleKeyDown = (e) => {
+//       if (e.key === 'Escape') onClose()
+//     }
+
+//     if (isOpen) {
+//       window.addEventListener('keydown', handleKeyDown)
+//       document.body.classList.add('menu-open')
+//     }
+
+//     return () => {
+//       window.removeEventListener('keydown', handleKeyDown)
+//       document.body.classList.remove('menu-open')
+//     }
+//   }, [isOpen, onClose])
+
+//   if (!isOpen) return null
+
+//   return (
+//     <AnimatePresence>
+//       <div
+//         className="media-viewer-backdrop"
+//         onClick={onClose}
+//         role="dialog"
+//         aria-modal="true"
+//       >
+//         <motion.div
+//           initial={{ opacity: 0, scale: 0.97 }}
+//           animate={{ opacity: 1, scale: 1 }}
+//           exit={{ opacity: 0, scale: 0.97 }}
+//           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+//           className="media-viewer-modal"
+//           onClick={(e) => e.stopPropagation()}
+//         >
+//           <button
+//             onClick={onClose}
+//             className="media-viewer-close"
+//             aria-label="Close media viewer"
+//           >
+//             ✕
+//           </button>
+
+//           <div className="media-viewer-media">
+//             <img
+//               src={mediaSrc}
+//               alt={mediaAlt || title || 'Enlarged media frame'}
+//               style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+//               referrerPolicy="no-referrer"
+//             />
+//           </div>
+
+//           {(title || caption) && (
+//             <div className="media-viewer-content">
+//               {title && <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.35rem' }}>{title}</h3>}
+//               {caption && <p style={{ fontSize: '0.875rem', color: 'rgba(10, 10, 10, 0.65)', fontWeight: 300 }}>{caption}</p>}
+//             </div>
+//           )}
+//         </motion.div>
+//       </div>
+//     </AnimatePresence>
+//   )
+// }
+
+import React, { useEffect } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+
+import VideoPlayer from './VideoPlayer.jsx'
 
 export default function MediaViewer({
   isOpen,
   onClose,
-  mediaType = 'image', // 'image' | 'video'
+  mediaType = 'image',
   mediaSrc,
   posterSrc,
-  alt = 'Full-screen cinematography media',
-  title = '',
-  caption = '',
+  mediaAlt,
+  title,
+  caption,
+  showControls = true,
 }) {
-  const closeButtonRef = useRef(null)
-  const videoRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-
-  const togglePlay = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    if (video.paused) {
-      video.play().catch(() => { })
-    } else {
-      video.pause()
-    }
-  }
-
-  const toggleMute = () => {
-    const video = videoRef.current
-    if (!video) return
-
-    video.muted = !video.muted
-    setIsMuted(video.muted)
-  }
-
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
+    if (!isOpen) return undefined
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
         onClose()
       }
     }
 
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown)
-      document.body.classList.add('menu-open')
-      setTimeout(() => {
-        closeButtonRef.current?.focus()
-      }, 50)
-    }
+    const previousOverflow = document.body.style.overflow
+
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
 
     return () => {
+      document.body.style.overflow = previousOverflow
       window.removeEventListener('keydown', handleKeyDown)
-      document.body.classList.remove('menu-open')
     }
   }, [isOpen, onClose])
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.src = mediaSrc || ''
-      videoRef.current.poster = posterSrc || ''
-    }
-  }, [mediaSrc, posterSrc])
-
-  useEffect(() => {
-    if (videoRef.current) {
-      const handleEnded = () => {
-        setIsPlaying(false)
-      }
-      videoRef.current.addEventListener('ended', handleEnded)
-      return () => {
-        videoRef.current.removeEventListener('ended', handleEnded)
-      }
-    }
-  }, [])
-
-  if (!isOpen) {
-    return null
-  }
-
-  return createPortal(
+  return (
     <AnimatePresence>
-      <div
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 120,
-          backgroundColor: 'rgba(10, 10, 10, 0.95)',
-          backdropFilter: 'blur(10px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 'var(--site-gutter)',
-        }}
-        onClick={onClose}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title || 'Media Viewer'}
-      >
+      {isOpen && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.97 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            position: 'relative',
-            maxWidth: '1200px',
-            width: '100%',
-            maxHeight: '92vh',
-            display: 'flex',
-            flexDirection: 'column',
-            backgroundColor: 'var(--color-black-soft)',
-            border: '1px solid var(--border-dark)',
-            overflow: 'hidden',
+          className="media-viewer-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: 0.25,
+            ease: [0.22, 1, 0.36, 1],
           }}
-          onClick={(e) => e.stopPropagation()}
+          onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={title || 'Media viewer'}
         >
-          {/* Close Button */}
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            aria-label="Close full-screen media viewer"
-            style={{
-              position: 'absolute',
-              top: '1rem',
-              right: '1rem',
-              zIndex: 10,
-              width: '2.5rem',
-              height: '2.5rem',
-              backgroundColor: 'rgba(10, 10, 10, 0.85)',
-              color: 'var(--color-off-white)',
-              border: '1px solid var(--border-dark)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              transition: 'background-color 0.2s ease',
+          <motion.div
+            className="media-viewer-modal"
+            initial={{
+              opacity: 0,
+              scale: 0.985,
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--color-red)'
+            animate={{
+              opacity: 1,
+              scale: 1,
             }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(10, 10, 10, 0.85)'
+            exit={{
+              opacity: 0,
+              scale: 0.985,
             }}
+            transition={{
+              duration: 0.3,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            onClick={(event) => event.stopPropagation()}
           >
-            ✕
-          </button>
-
-          {/* Media Container */}
-          <div
-            style={{
-              width: '100%',
-              aspectRatio: '16/9',
-              backgroundColor: 'var(--color-black)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-          >
-            {mediaType === 'video' ? (
-              <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-                <video
-                  ref={videoRef}
-                  src={mediaSrc}
-                  poster={posterSrc}
-                  playsInline
-                  autoPlay
-                  loop
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                />
-                {/* Controls Overlay */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '48px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '12px',
-                    padding: '0 12px',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    // We'll show controls always in fullscreen for simplicity
-                    opacity: 1,
-                  }}
-                >
-                  {/* Play/Pause Button */}
-                  <button
-                    onClick={togglePlay}
-                    aria-label={isPlaying ? 'Pause' : 'Play'}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: 'var(--color-off-white)',
-                      cursor: 'pointer',
-                      padding: 0,
-                    }}
-                  >
-                    {isPlaying ? (
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <rect x="6" y="4" width="4" height="16" />
-                        <rect x="14" y="4" width="4" height="16" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polygon points="6 3 20 12 6 21 6 3" />
-                      </svg>
-                    )}
-                  </button>
-                  {/* Mute/Unmute Button */}
-                  <button
-                    onClick={toggleMute}
-                    aria-label={isMuted ? 'Unmute' : 'Mute'}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'transparent',
-                      border: 'none',
-                      color: 'var(--color-off-white)',
-                      cursor: 'pointer',
-                      padding: 0,
-                    }}
-                  >
-                    {isMuted ? (
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <line x1="23" y1="9" x2="17" y2="15" />
-                        <line x1="17" y1="9" x2="23" y2="15" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <img
-                src={mediaSrc}
-                alt={alt}
-                referrerPolicy="no-referrer"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            )}
-          </div>
-
-          {/* Optional Caption */}
-          {(title || caption) && (
-            <div
-              style={{
-                padding: '1.25rem 1.5rem',
-                backgroundColor: 'var(--color-black-soft)',
-                color: 'var(--color-off-white)',
-              }}
+            <button
+              type="button"
+              onClick={onClose}
+              className="media-viewer-close"
+              aria-label="Close media viewer"
             >
-              {title && (
-                <div style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '0.04em' }}>
-                  {title}
-                </div>
-              )}
-              {caption && (
-                <div style={{ fontSize: '0.85rem', color: 'rgba(243, 240, 232, 0.65)', marginTop: '0.25rem', fontWeight: 300 }}>
-                  {caption}
-                </div>
-              )}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
+            </button>
+
+            <div className="media-viewer-media">
+              {mediaType === 'video' && mediaSrc ? (
+                <VideoPlayer
+                  videoSrc={mediaSrc}
+                  posterSrc={posterSrc}
+                  title={title || 'Showreel'}
+                  controls={true}
+                  showVolumeControls={false}
+                  muted
+                  playsInline
+                  aspectRatio="16/9"
+                />
+              ) : mediaSrc ? (
+                <img
+                  src={mediaSrc}
+                  alt={
+                    mediaAlt ||
+                    title ||
+                    'Enlarged media frame'
+                  }
+                  className="media-viewer-image"
+                  referrerPolicy="no-referrer"
+                />
+              ) : null}
             </div>
-          )}
+
+            {(title || caption) && (
+              <div className="media-viewer-content">
+                {/* {title && (
+                  <h3 className="media-viewer-title">
+                    {title}
+                  </h3>
+                )} */}
+
+                {caption && (
+                  <p className="media-viewer-caption">
+                    {caption}
+                  </p>
+                )}
+              </div>
+            )}
+          </motion.div>
+
+          <style>{`
+            .media-viewer-backdrop {
+              position: fixed;
+              inset: 0;
+              z-index: 9999;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: clamp(16px, 3vw, 40px);
+              background: rgba(0, 0, 0, 0.92);
+              backdrop-filter: blur(8px);
+            }
+
+            .media-viewer-modal {
+              position: relative;
+              width: min(1400px, 100%);
+              max-height: calc(100vh - 32px);
+              display: flex;
+              flex-direction: column;
+              overflow: hidden;
+              background: #050505;
+              box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+            }
+
+            .media-viewer-media {
+              width: 100%;
+              min-height: 0;
+              background: #000;
+            }
+
+            .media-viewer-image {
+              display: block;
+              width: 100%;
+              max-height: calc(100vh - 120px);
+              object-fit: contain;
+              background: #000;
+            }
+
+            .media-viewer-close {
+              position: absolute;
+              top: 12px;
+              right: 12px;
+              z-index: 30;
+              width: 38px;
+              height: 38px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              padding: 0;
+              border: 1px solid rgba(255, 255, 255, 0.28);
+              border-radius: 50%;
+              background: rgba(0, 0, 0, 0.48);
+              color: #fff;
+              cursor: pointer;
+              backdrop-filter: blur(8px);
+              transition:
+                background 160ms ease,
+                border-color 160ms ease,
+                transform 160ms ease;
+            }
+
+            .media-viewer-close:hover {
+              background: rgba(0, 0, 0, 0.78);
+              border-color: rgba(255, 255, 255, 0.65);
+              transform: scale(1.04);
+            }
+
+            .media-viewer-close svg {
+              width: 17px;
+              height: 17px;
+            }
+
+            .media-viewer-content {
+              flex: 0 0 auto;
+              padding: 14px 18px 16px;
+              background: #050505;
+              color: #fff;
+              border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .media-viewer-title {
+              margin: 0;
+              font-size: 0.9rem;
+              line-height: 1.3;
+              font-weight: 500;
+            }
+
+            .media-viewer-caption {
+              margin: 4px 0 ;
+              color: rgba(255, 255, 255, 0.55);
+              font-size: 0.7rem;
+              line-height: 1.5;
+              letter-spacing: 0.04em;
+            }
+
+            
+
+              .media-viewer-modal {
+                width: 100%;
+                max-height: 100vh;
+              }
+
+              .media-viewer-close {
+                top: 10px;
+                right: 10px;
+              }
+            }
+          `}</style>
         </motion.div>
-      </div>
-    </AnimatePresence>,
-    document.body
+      )}
+    </AnimatePresence>
   )
 }

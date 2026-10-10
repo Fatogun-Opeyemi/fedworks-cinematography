@@ -1,413 +1,141 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
 import HeroReel from '../components/HeroReel.jsx'
-import SectionHeader from '../components/SectionHeader.jsx'
-import MediaSquareGrid from '../components/media/MediaSquareGrid.jsx'
-import MediaRail from '../components/media/MediaRail.jsx'
+import MediaSquareCard from '../components/media/MediaSquareCard.jsx'
 import MediaViewer from '../components/media/MediaViewer.jsx'
+import CinematicLoader from '../components/CinematicLoader.jsx'
 import {
   getFeaturedProjects,
-  getAllProjects,
-  getBtsItems,
   getSiteSettings,
-  getMentoringContent,
-  getAboutContent,
-} from '../lib/sanity.js'
+  getFileUrl,
+  urlFor,
+} from '../libs/sanity.js'
 
 export default function Home() {
   const [featuredProjects, setFeaturedProjects] = useState([])
-  const [allProjects, setAllProjects] = useState([])
-  const [btsItems, setBtsItems] = useState([])
   const [siteSettings, setSiteSettings] = useState(null)
-  const [mentoring, setMentoring] = useState(null)
   const [isViewerOpen, setIsViewerOpen] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+
 
   useEffect(() => {
     let mounted = true
-    async function loadData() {
-      try {
-        const [feat, all, bts, settings, ment] = await Promise.all([
-          getFeaturedProjects(),
-          getAllProjects(),
-          getBtsItems(),
-          getSiteSettings(),
-          getMentoringContent(),
-        ])
-        if (mounted) {
-          setFeaturedProjects(feat)
-          setAllProjects(all)
-          setBtsItems(bts)
-          setSiteSettings(settings)
-          setMentoring(ment)
-          setLoading(false)
-        }
-      } catch (err) {
-        if (mounted) setLoading(false)
+    let releaseTimeout = null
+
+    const startedAt = Date.now()
+    const minimumDisplayTime = 850
+
+    const safetyTimeout = window.setTimeout(() => {
+      if (mounted) {
+        setIsLoading(false)
       }
+    }, 7000)
+
+    async function loadData() {
+      const results = await Promise.allSettled([
+        getFeaturedProjects(),
+        getSiteSettings(),
+      ])
+
+      if (!mounted) return
+
+      const [featuredResult, settingsResult] = results
+
+      if (featuredResult.status === 'fulfilled') {
+        setFeaturedProjects(featuredResult.value || [])
+      } else {
+        console.error(
+          'Failed to load featured projects:',
+          featuredResult.reason,
+        )
+      }
+
+      if (settingsResult.status === 'fulfilled') {
+        setSiteSettings(settingsResult.value || null)
+      } else {
+        console.error(
+          'Failed to load site settings:',
+          settingsResult.reason,
+        )
+      }
+
+      window.clearTimeout(safetyTimeout)
+
+      const elapsed = Date.now() - startedAt
+      const remaining = Math.max(0, minimumDisplayTime - elapsed)
+
+      releaseTimeout = window.setTimeout(() => {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }, remaining)
     }
+
     loadData()
+
     return () => {
       mounted = false
+      window.clearTimeout(safetyTimeout)
+
+      if (releaseTimeout !== null) {
+        window.clearTimeout(releaseTimeout)
+      }
     }
   }, [])
-
-  // Canonical, slugified category values produced by getCanonicalCategory()/normalizeProject().
-  // "Narrative" work is normalised to the canonical "film" bucket.
-  const filmProjects = allProjects.filter(p => p.category === 'film')
-  const commercialProjects = allProjects.filter(p => p.category === 'commercial')
-  const musicVideoProjects = allProjects.filter(p => p.category === 'music-video')
 
   const heroVideoUrl = siteSettings?.heroVideoUrl || ''
   const heroPosterUrl = siteSettings?.heroPosterUrl || ''
 
-  // Build sections array
-  const sections = []
-
-  // 2. SELECTED WORKS
-  if (featuredProjects.length > 0) {
-    sections.push(
-      <section key="selected-works" className="selected-work-section">
-        <div className="site-container">
-          <div className="section-header-row-layout">
-            <SectionHeader
-              kicker=""
-              title="Featured Works"
-              subtitle="Cinematography commissions across narrative drama, commercials, and music films."
-            />
-            <Link to="/work" className="section-action-link">
-              View All Work
-            </Link>
-          </div>
-
-          <MediaSquareGrid projects={featuredProjects} />
-        </div>
-      </section>
-    )
-  }
-
-  // 3. NARRATIVE
-  if (filmProjects.length > 0) {
-    sections.push(
-      <section key="narrative" className="narrative-strip-section">
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Scripted Cinema"
-              title="Narrative"
-              subtitle="Atmospheric optical rendering, motivated light, and emotional duration."
-            />
-            <Link
-              to="/narrative"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--color-off-white)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              View All Narrative →
-            </Link>
-          </div>
-
-          <MediaSquareGrid projects={filmProjects} />
-        </div>
-      </section>
-    )
-  }
-
-  // 4. COMMERCIAL
-  if (commercialProjects.length > 0) {
-    sections.push(
-      <section key="commercial" className="selected-work-section" style={{ borderBottom: 'none' }}>
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Commissions"
-              title="Commercial"
-              subtitle="Precision tabletop, macro optics, high-speed movement, and location lighting."
-            />
-            <Link
-              to="/commercials"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--color-off-white)',
-
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              View All Commercials →
-            </Link>
-          </div>
-
-          <MediaSquareGrid projects={commercialProjects} />
-        </div>
-      </section>
-    )
-  }
-
-  // 5. MUSIC
-  if (musicVideoProjects.length > 0) {
-    sections.push(
-      <section key="music" className="narrative-strip-section">
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Rhythm & Sound"
-              title="Music"
-              subtitle="Experimental lighting design, optical grain, and rhythmic camera choreography created for recording artists."
-            />
-            <Link
-              to="/music"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                // color: 'var(--color-off-white)',
-                color: 'var(--color-black)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              View All Music Videos →
-            </Link>
-          </div>
-
-          <MediaSquareGrid projects={musicVideoProjects} />
-        </div>
-      </section>
-    )
-  }
-
-  // 6. BTS
-  if (btsItems.length > 0) {
-    sections.push(
-      <section key="bts" className="selected-work-section" style={{ borderBottom: 'none' }}>
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Camera Department"
-              title="BTS"
-              subtitle="Behind-the-scenes moments, camera rigs, optical tests, and images of the cinematographer working in the field."
-            />
-            <Link
-              to="/on-set"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--color-off-white)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              View All BTS →
-            </Link>
-          </div>
-
-          <MediaSquareGrid
-            projects={btsItems.map(item => ({
-              ...item,
-              title: item.caption,
-              posterUrl: item.image?.asset?.url,
-              videoUrl: item.video?.asset?.url,
-              categoryLabel: 'BTS',
-            }))}
-          />
-        </div>
-      </section>
-    )
-  }
-
-  // 7. MENTORING
-  if (mentoring) {
-    sections.push(
-      <section key="mentoring" className="selected-work-section" style={{ borderBottom: 'none' }}>
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Shadow a shoot"
-              title="Mentoring"
-              subtitle="Dedicated shadowing program offering emerging camera assistants and cinematographers direct access to active working sets, lighting setups, and optical camera tests."
-            />
-            <Link
-              to="/mentoring"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--color-off-white)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              Learn About Mentoring →
-            </Link>
-          </div>
-
-          {/* Mentoring content */}
-          <div style={{ marginTop: '3.5rem' }}>
-            {mentoring.mentoringHeading && (
-              <h2 style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 600, marginBottom: '1rem', color: 'var(--color-black)' }}>
-                {mentoring.mentoringHeading}
-              </h2>
-            )}
-            {mentoring.mentoringBody && (
-              <div style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', fontWeight: 300, lineHeight: 1.6, color: 'rgba(10, 10, 10, 0.8)', maxWidth: '58ch' }}>
-                {mentoring.mentoringBody}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  // 8. ABOUT
-  if (siteSettings) {
-    sections.push(
-      <section key="about" className="selected-work-section" style={{ borderBottom: 'none' }}>
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Practice & Ethos"
-              title="About"
-              subtitle="Director of Photography working internationally across narrative features, music films, commercials, and documentary projects."
-            />
-            <Link
-              to="/about"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                // color: 'var(--color-off-white)',
-                color: 'var(--color-black)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              About Fedworks →
-            </Link>
-          </div>
-
-          {/* About content */}
-          <div style={{ marginTop: '3.5rem' }}>
-            {siteSettings.aboutHeading && (
-              <h2 style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 600, marginBottom: '1rem', color: 'var(--color-black)' }}>
-                {siteSettings.aboutHeading}
-              </h2>
-            )}
-            {siteSettings.aboutBody && (
-              <div style={{ fontSize: 'clamp(1rem, 1.5vw, 1.25rem)', fontWeight: 300, lineHeight: 1.6, color: 'rgba(10, 10, 10, 0.8)', maxWidth: '58ch' }}>
-                {siteSettings.aboutBody}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  // 9. CONTACT
-  if (siteSettings) {
-    sections.push(
-      <section key="contact" className="selected-work-section" style={{ borderBottom: 'none' }}>
-        <div className="site-container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <SectionHeader
-              kicker="Get in touch"
-              title="Contact"
-              subtitle="For inquiries, collaborations, or questions."
-            />
-            <Link
-              to="/contact"
-              style={{
-                fontSize: '0.8125rem',
-                fontWeight: 600,
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                color: 'var(--color-off-white)',
-                textDecoration: 'underline',
-                paddingBottom: '0.5rem',
-              }}
-            >
-              Contact Fedworks →
-            </Link>
-          </div>
-
-          {/* Contact details */}
-          <div style={{ marginTop: '3.5rem' }}>
-            {siteSettings.contactEmail && (
-              <div style={{ marginBottom: '1rem' }}>
-                <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>Email:</span>
-                <a href={`mailto:${siteSettings.contactEmail}`} style={{ color: 'var(--color-off-white)', textDecoration: 'underline' }}>
-                  {siteSettings.contactEmail}
-                </a>
-              </div>
-            )}
-            {siteSettings.phone && (
-              <div style={{ marginBottom: '1rem' }}>
-                <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>Phone:</span>
-                <span style={{ color: 'var(--color-off-white)' }}>{siteSettings.phone}</span>
-              </div>
-            )}
-            {siteSettings.instagramUrl && (
-              <div style={{ marginBottom: '1rem' }}>
-                <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>Instagram:</span>
-                <a href={siteSettings.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-off-white)', textDecoration: 'underline' }}>
-                  {siteSettings.instagramUrl}
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
-    )
-  }
-
+  console.log('Hero video URL:', heroVideoUrl)
+  console.log('Hero poster URL:', heroPosterUrl)
   return (
-    <div style={{ width: '100%', overflowX: 'hidden' }}>
-      {/* ==================================================================
-          1. HERO SHOWREEL EXPERIENCE (Master Prompt #2 & #3)
-          Actual video montage & poster, Chukwuka Edeogu (Fedworks) + DIRECTOR OF PHOTOGRAPHY
-          ================================================================== */}
+    <div className="fedworks-home">
+      <CinematicLoader visible={isLoading} />
+
+      {/* HERO */}
       <HeroReel
         videoSrc={heroVideoUrl}
         posterSrc={heroPosterUrl}
-        onWatchReel={heroVideoUrl ? () => setIsViewerOpen(true) : undefined}
+        onWatchReel={
+          heroVideoUrl
+            ? () => setIsViewerOpen(true)
+            : undefined
+        }
       />
 
-      {/* Render sections with dividers between them */}
-      {/* {sections.map((section, index) => (
-        <React.Fragment key={section.key || index}>
-          {section}
-          {index < sections.length - 1 && (
-            <div
-              style={{
-                // borderTop: '1px solid var(--color-red)',
-                height: '1px',
-                width: '100%',
-                margin: '0',
-              }}
-            />
-          )}
-        </React.Fragment>
-      ))} */}
+      {/* SELECTED WORKS */}
+      {featuredProjects.length > 0 && (
+        <section className="home-section home-section-selected">
+          <div className="site-container">
+            <div className="home-section-header">
+              <h2
+                id="selected-works-heading"
+                className="home-section-title"
+              >
+                Selected Works
+              </h2>
+            </div>
 
-      {sections.map((section) => section)}
+            {/* Selected Works Grid */}
+            <div className="home-selected-work-grid">
+              {featuredProjects.map((project, index) => (
+                <div
+                  key={project._id}
+                  className="home-selected-work-item"
+                >
+                  <MediaSquareCard
+                    project={project}
+                    delay={Math.min(index * 0.05, 0.25)}
+                    hideCategoryTag={true}
+                    showOnlyTitle={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* Full-Screen Showreel Modal */}
+      {/* SHOWREEL VIEWER */}
       {heroVideoUrl && (
         <MediaViewer
           isOpen={isViewerOpen}
@@ -415,10 +143,209 @@ export default function Home() {
           mediaType="video"
           mediaSrc={heroVideoUrl}
           posterSrc={heroPosterUrl}
-          title="Chukwuka Edeogu (Fedworks) — Showreel"
-          caption="Portfolio reel."
+          title="Chukwuka Edeogu Showreel"
+          caption="Portfolio reel"
+          showControls={false}
         />
+
       )}
+
+      <style>{`
+        .fedworks-home {
+          width: 100%;
+          overflow-x: hidden;
+          background: var(--color-off-white);
+          color: var(--color-black);
+        }
+
+        .home-section {
+          padding: 2rem 0;
+        }
+
+        .home-section-selected {
+          padding-top: 2rem;
+        }
+
+         .home-section-header {
+            margin-bottom: clamp(2rem, 4vw, 3.5rem);
+         }
+
+        .home-section-title {
+          margin: 0;
+          color: var(--color-black);
+          font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+          line-height: 1;
+          font-weight: 500;
+          letter-spacing: -0.03em;
+          text-transform: uppercase;
+        }
+
+        /*
+         * SELECTED WORKS GRID
+         */
+
+        .home-selected-work-grid {
+          display: grid;
+          gap: 10px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .home-selected-work-item {
+          min-width: 0;
+        }
+
+        /*
+         * MEDIA FRAME
+         *
+         * Keeps the zoomed media inside its frame.
+         */
+
+        .home-selected-work-item .media-square-card .square-media-asset {
+          overflow: hidden;
+        }
+
+        /*
+         * MEDIA — NORMAL STATE
+         *
+         * Both images and videos start at their natural scale.
+         */
+
+        .home-selected-work-item .media-square-card .square-media-asset img,
+        .home-selected-work-item .media-square-card .square-media-asset video,
+        .home-selected-work-item .media-square-card video {
+          transform: scale(1);
+          transition: transform 0.5s cubic-bezier(0.2, 0.65, 0.3, 1);
+          will-change: transform;
+        }
+
+        /*
+         * MEDIA — HOVER STATE
+         *
+         * Change 1.05 to control the amount of zoom.
+         *
+         * 1.01 = extremely subtle
+         * 1.02 = subtle
+         * 1.03 = refined
+         * 1.05 = noticeable
+         * 1.08 = strong
+         * 1.10 = dramatic
+         */
+
+        .home-selected-work-item:hover .media-square-card .square-media-asset img,
+        .home-selected-work-item:hover .media-square-card .square-media-asset video,
+        .home-selected-work-item:hover .media-square-card video {
+          transform: scale(1.05) !important;
+        }
+
+        /*
+         * HIDE META BOX BY DEFAULT
+         */
+
+        .home-selected-work-item .media-square-card .square-meta-box {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease;
+        }
+
+        /*
+         * REVEAL TITLE ON HOVER
+         */
+
+        .home-selected-work-item:hover .media-square-card .square-meta-box {
+          max-height: 100px;
+        }
+
+        /*
+         * REDUCED MOTION
+         */
+
+        @media (prefers-reduced-motion: reduce) {
+          .home-selected-work-item .media-square-card .square-media-asset img,
+          .home-selected-work-item .media-square-card .square-media-asset video,
+          .home-selected-work-item .media-square-card video {
+            transition: none;
+          }
+
+          .home-selected-work-item .media-square-card .square-meta-box {
+            transition: none;
+          }
+        }
+
+        .home-selected-work-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        @media (min-width: 499px) {
+          .home-selected-work-grid {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+          }
+        }
+
+        @media (min-width: 500px) and (max-width: 799px) {
+          .home-selected-work-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (min-width: 800px) and (max-width: 1023px) {
+          .home-selected-work-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
+        }
+
+        /*
+         * TABLET
+         */
+
+        @media (min-width: 1024px) {
+          .home-selected-work-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+        }
+
+        /*
+         * MOBILE
+         */
+
+        @media (max-width: 767px) {
+          .home-section {
+            padding: 2rem 0;
+          }
+
+          .home-section-selected {
+            padding-top: 1.75rem;
+          }
+
+          .home-section-header {
+            margin-bottom: 2rem;
+          }
+
+          .home-section-title {
+            font-size: 1.4rem;
+          }
+        }
+
+        /*
+         * TOUCH DEVICES
+         *
+         * No hover zoom on touch devices.
+         */
+
+        @media (hover: none) {
+          .home-selected-work-item .media-square-card .square-meta-box {
+            max-height: 0;
+          }
+
+          .home-selected-work-item .media-square-card .square-media-asset img,
+          .home-selected-work-item .media-square-card .square-media-asset video,
+          .home-selected-work-item .media-square-card video {
+            transform: scale(1) !important;
+            transition: none;
+          }
+        }
+      `}</style>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
@@ -18,17 +19,19 @@ export default function MenuOverlay({ isOpen, onClose }) {
     if (isOpen) {
       window.addEventListener('keydown', handleKeyDown)
       document.body.classList.add('menu-open')
+
       const timer = setTimeout(() => {
         firstLinkRef.current?.focus()
       }, 60)
+
       return () => {
         clearTimeout(timer)
         window.removeEventListener('keydown', handleKeyDown)
         document.body.classList.remove('menu-open')
       }
-    } else {
-      document.body.classList.remove('menu-open')
     }
+
+    document.body.classList.remove('menu-open')
   }, [isOpen, onClose])
 
   return (
@@ -38,38 +41,49 @@ export default function MenuOverlay({ isOpen, onClose }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            duration: 0.3,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           className="menu-overlay-backdrop"
           role="dialog"
           aria-modal="true"
           aria-label="Navigation Menu"
         >
+          {/* HEADER */}
           <div className="menu-header-bar">
             <Link
               to="/"
               onClick={onClose}
               className="nav-brand"
-              style={{ color: 'var(--color-off-white)' }}
+              aria-label="FEDWORKS — Home"
             >
-              FEDWORKS
+              Chukwuka Edeogu
             </Link>
 
             <button
               ref={closeBtnRef}
               onClick={onClose}
               className="menu-close-action"
-              aria-label="Close navigation overlay"
+              aria-label="Close navigation menu"
+              type="button"
             >
-              CLOSE [ESC]
+              <span aria-hidden="true">&times;</span>
             </button>
           </div>
 
+          {/* NAVIGATION */}
           <div className="menu-items-container">
-            <nav className="menu-items-stack" aria-label="Mobile navigation directory">
+            <nav
+              className="menu-items-stack"
+              aria-label="Mobile navigation directory"
+            >
               {NAV_ITEMS.map((item, idx) => {
                 const isActive =
                   location.pathname === item.path ||
-                  (item.path !== '/' && location.pathname.startsWith(item.path + '/'))
+                  (item.path !== '/' &&
+                    location.pathname.startsWith(item.path + '/'))
+
                 const num = String(idx + 1).padStart(2, '0')
 
                 return (
@@ -78,16 +92,30 @@ export default function MenuOverlay({ isOpen, onClose }) {
                     to={item.path}
                     ref={idx === 0 ? firstLinkRef : null}
                     onClick={onClose}
-                    className={`menu-nav-link ${isActive ? 'active' : ''}`}
+                    className={`menu-nav-link ${isActive ? 'active' : ''
+                      }`}
                   >
-                    <span className="menu-index-num tabular-nums">{num}</span>
-                    <span>{item.label}</span>
+                    <span className="menu-index-num tabular-nums">
+                      {num}
+                    </span>
+
+                    <span className="menu-nav-label">
+                      {item.label}
+                    </span>
+
+                    {/* <span
+                      className="menu-nav-arrow"
+                      aria-hidden="true"
+                    >
+                      ↗
+                    </span> */}
                   </Link>
                 )
               })}
             </nav>
           </div>
 
+          {/* FOOTER */}
           <div className="menu-footer-bar">
             <div>DIRECTOR OF PHOTOGRAPHY</div>
             <div>Inquiries: studio@fedworks.com</div>

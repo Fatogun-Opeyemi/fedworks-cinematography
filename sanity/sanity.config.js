@@ -6,7 +6,7 @@ export default defineConfig({
   name: 'default',
   title: 'FEDWORKS Studio',
 
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID || '1qg7m6y2',
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID || '4t9t903j',
   dataset: process.env.SANITY_STUDIO_DATASET || 'production',
 
   plugins: [

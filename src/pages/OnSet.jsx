@@ -1,55 +1,123 @@
-import React, { useState, useEffect } from 'react'
+import React, {
+  useEffect,
+  useState,
+} from 'react'
+
 import SectionHeader from '../components/SectionHeader.jsx'
 import MediaSquareGrid from '../components/media/MediaSquareGrid.jsx'
-import { getBtsItems } from '../lib/sanity/queries.js'
+import { getProjectsByCategory } from '../libs/sanity.js'
+import { Link } from 'react-router-dom'
 
 export default function OnSet() {
-  const [btsItems, setBtsItems] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [btsItems, setBtsItems] =
+    useState([])
+
+  const [loading, setLoading] =
+    useState(true)
+
+  const [error, setError] =
+    useState('')
 
   useEffect(() => {
     let mounted = true
-    getBtsItems().then(data => {
-      if (mounted) {
-        setBtsItems(data)
+
+    async function loadBtsContent() {
+      try {
+        setError('')
+
+        const data =
+          await getProjectsByCategory("bts")
+
+        if (!mounted) return
+
+        setBtsItems(
+          Array.isArray(data)
+            ? data
+            : [],
+        )
+
+        setLoading(false)
+      } catch (err) {
+        console.error(
+          'Failed to load BTS content:',
+          err,
+        )
+
+        if (!mounted) return
+
+        setBtsItems([])
+        setError(
+          'Unable to load bts media.',
+        )
         setLoading(false)
       }
-    })
+    }
+
+    loadBtsContent()
+
     return () => {
       mounted = false
     }
   }, [])
 
-  // Format BTS items for MediaSquareGrid
-  const btsProjects = btsItems.map(item => ({
-    _id: item._id,
-    title: item.caption || 'BTS Sequence',
-    category: 'on-set',
-    categoryLabel: 'BTS',
-    clientOrArtist: item.location || 'Location Set',
-    location: item.location,
-    dateFormatted: item.dateFormatted,
-    poster: item.image?.asset?.url || item.posterUrl || '',
-    posterUrl: item.image?.asset?.url || item.posterUrl || '',
-    videoUrl: item.video?.asset?.url || item.videoUrl || null,
-    slug: { current: '' },
-  }))
-
   return (
-    <div className="selected-work-section" style={{ minHeight: '80vh', paddingTop: '7.5rem' }}>
+    <div
+      className="selected-work-section archive-media-grid"
+      style={{
+        minHeight: '80vh',
+        paddingTop: '2rem',
+      }}
+    >
       <div className="site-container">
-         <SectionHeader
-           kicker="Camera Department"
-           title="BTS"
-           subtitle="Behind-the-scenes moments, camera rigs, optical tests, and images of the cinematographer working in the field."
-         />
+        <div className="mobile-section-intro">
+          <SectionHeader title="Bts" />
+
+          <Link to="/" className="mobile-back-home">
+            ← Back Home
+          </Link>
+        </div>
 
         {loading ? (
-          <div style={{ padding: '4rem 0', color: 'rgba(10, 10, 10, 0.5)', fontSize: '0.875rem' }}>
+          <div
+            style={{
+              padding: '4rem 0',
+              color:
+                'rgba(10, 10, 10, 0.5)',
+              fontSize: '0.875rem',
+            }}
+          >
             Loading on-set archive...
           </div>
+        ) : error ? (
+          <div
+            style={{
+              padding: '4rem 0',
+              color:
+                'rgba(10, 10, 10, 0.6)',
+              fontSize: '0.875rem',
+            }}
+          >
+            {error}
+          </div>
+        ) : btsItems.length === 0 ? (
+          <div
+            style={{
+              padding: '4rem 0',
+              color:
+                'rgba(10, 10, 10, 0.6)',
+              fontSize: '0.875rem',
+            }}
+          >
+            No behind-the-scenes media
+            has been published yet.
+          </div>
         ) : (
-          <MediaSquareGrid projects={btsProjects} />
+          <MediaSquareGrid
+            projects={btsItems}
+            showFilters={false}
+            showCategory={false}
+            showMetadata={false}
+          />
         )}
       </div>
     </div>

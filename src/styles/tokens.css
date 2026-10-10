@@ -5,33 +5,57 @@
 
 /* Local font-face declarations strictly from src/assets/fonts/Ranade/ */
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Light.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicLight.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Regular.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicBook.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Medium.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicMedium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Bold.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicDemi.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicBold.ttf') format('truetype');
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicHeavy.ttf') format('truetype');
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
@@ -44,10 +68,10 @@
   --color-red: #9E2F2B;
 
   /* Typography */
-  --font-family: 'Ranade', sans-serif;
-  --font-display: 'Ranade', sans-serif;
-  --font-body: 'Ranade', sans-serif;
-  --font-meta: 'Ranade', sans-serif;
+  --font-family: 'Futura', sans-serif;
+  --font-display: 'Futura', sans-serif;
+  --font-body: 'Futura', sans-serif;
+  --font-meta: 'Futura', sans-serif;
 
   /* Layout Boundaries & Responsive Gutters */
   --max-content-width: 1600px;

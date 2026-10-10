@@ -5,33 +5,57 @@
 
 /* Local Ranade font-face declarations only (no external font services) */
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Light.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicLight.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Regular.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicBook.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Medium.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicMedium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Ranade';
-  src: url('/src/assets/fonts/Ranade/Ranade-Bold.woff2') format('woff2');
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicDemi.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicBold.ttf') format('truetype');
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('/fonts/FuturaCyrillicHeavy.ttf') format('truetype');
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
@@ -44,7 +68,11 @@
   --color-red: #9E2F2B;
 
   /* Typography */
-  --font-family: 'Ranade', sans-serif;
+
+
+  :root {
+    --font-family: 'Futura', sans-serif;
+  }
 
   /* Layout Boundaries */
   --max-content-width: 1600px;
@@ -342,7 +370,7 @@ video {
    ========================================================================== */
 
 .section-header {
-  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: 0.5rem;
 }
 
 .section-kicker {
@@ -365,8 +393,10 @@ video {
 }
 
 .section-title {
-  font-size: clamp(2rem, 4.5vw, 3.75rem);
-  font-weight: 700;
+  /* font-size: clamp(2rem, 4.5vw, 3.75rem); */
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  color: red;
+  font-weight: 300;
   line-height: 1.08;
   letter-spacing: -0.025em;
   color: var(--color-black);
@@ -857,11 +887,11 @@ video {
 
 .site-footer {
   margin-top: auto;
-  background-color: var(--color-black);
-  color: var(--color-off-white);
+  background-color: var(--color-off-white);
+  color: var(--color-black);
   padding-top: clamp(3rem, 6vw, 5rem);
   padding-bottom: 3rem;
-  border-top: 1px solid var(--border-subtle-dark);
+  border-top: 1px solid var(--border-subtle);
 }
 
 .footer-inner {
@@ -883,12 +913,13 @@ video {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   margin-bottom: 0.5rem;
+  color: var(--color-black);
 }
 
 .footer-brand-sub {
   font-size: 0.875rem;
   font-weight: 300;
-  color: rgba(243, 240, 232, 0.6);
+  color: rgba(10, 10, 10, 0.6);
   max-width: 36ch;
 }
 
@@ -897,7 +928,7 @@ video {
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-off-white);
+  color: var(--color-black);
   margin-bottom: 1rem;
 }
 
@@ -909,12 +940,12 @@ video {
 
 .footer-nav-link {
   font-size: 0.8125rem;
-  color: rgba(243, 240, 232, 0.65);
+  color: rgba(10, 10, 10, 0.65);
   transition: color 0.15s ease;
 }
 
 .footer-nav-link:hover {
-  color: var(--color-off-white);
+  color: var(--color-red);
 }
 
 .footer-bottom {
@@ -922,9 +953,9 @@ video {
   flex-direction: column;
   gap: 1rem;
   padding-top: 2rem;
-  border-top: 1px solid var(--border-subtle-dark);
+  border-top: 1px solid var(--border-subtle);
   font-size: 0.75rem;
-  color: rgba(243, 240, 232, 0.5);
+  color: rgba(10, 10, 10, 0.5);
 }
 
 @media (min-width: 768px) {
@@ -1451,4 +1482,6 @@ video {
   .about-portrait img {
     transition: none;
   }
+
+
 }

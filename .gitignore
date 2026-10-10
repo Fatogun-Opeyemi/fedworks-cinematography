@@ -8,6 +8,9 @@ coverage/
 !.env.example
 .env
 !.env.example
+.env.local
 AGENTS.md
 .clinerules/
 .cline/
+.kilo/
+fedworks/AGENTS.md

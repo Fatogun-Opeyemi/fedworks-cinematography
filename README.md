@@ -1,20 +1,40 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+FEDWORKS
 
-# Run and deploy your AI Studio app
+A cinematography and visual storytelling portfolio showcasing work across narrative films, documentaries, commercials, music videos, and behind-the-scenes productions.
 
-This contains everything you need to run your app locally.
+Built with React, Vite, and Sanity CMS.
 
-View your app in AI Studio: https://ai.studio/apps/fe3a183d-b744-4eaf-9518-b20fa459e816
+Features
+* Cinematic showreel and featured projects
+* Portfolio organized by creative category
+* Individual project pages
+* Video and image galleries
+* About, contact, and mentoring sections
+* Responsive design
+* Sanity-powered content management
 
-## Run Locally
+Tech Stack
+* React
+* Vite
+* Sanity CMS
+* JavaScript and CSS
 
-**Prerequisites:**  Node.js
+Getting Started
+
+Install dependencies:
+
+bash
+npm install
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Start the development server:
+
+bash
+npm run dev
+
+
+Build for production:
+
+bash
+npm run build
+
