@@ -1,22 +1,13 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react'
-
+import React, { useEffect, useState } from 'react'
 import SectionHeader from '../components/SectionHeader.jsx'
 import MediaSquareGrid from '../components/media/MediaSquareGrid.jsx'
 import { getProjectsByCategory } from '../libs/sanity.js'
 import { Link } from 'react-router-dom'
 
 export default function OnSet() {
-  const [btsItems, setBtsItems] =
-    useState([])
-
-  const [loading, setLoading] =
-    useState(true)
-
-  const [error, setError] =
-    useState('')
+  const [btsItems, setBtsItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -25,31 +16,22 @@ export default function OnSet() {
       try {
         setError('')
 
-        const data =
-          await getProjectsByCategory("bts")
+        const data = await getProjectsByCategory('bts')
 
         if (!mounted) return
 
-        setBtsItems(
-          Array.isArray(data)
-            ? data
-            : [],
-        )
-
-        setLoading(false)
+        setBtsItems(Array.isArray(data) ? data : [])
       } catch (err) {
-        console.error(
-          'Failed to load BTS content:',
-          err,
-        )
+        console.error('Failed to load BTS content:', err)
 
         if (!mounted) return
 
         setBtsItems([])
-        setError(
-          'Unable to load bts media.',
-        )
-        setLoading(false)
+        setError('Unable to load BTS media.')
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
       }
     }
 
@@ -78,22 +60,18 @@ export default function OnSet() {
         </div>
 
         {loading ? (
-          <div
-            style={{
-              padding: '4rem 0',
-              color:
-                'rgba(10, 10, 10, 0.5)',
-              fontSize: '0.875rem',
-            }}
-          >
-            Loading on-set archive...
-          </div>
+          <MediaSquareGrid
+            projects={[]}
+            showFilters={false}
+            showCategory={false}
+            showMetadata={false}
+            isLoading={true}
+          />
         ) : error ? (
           <div
             style={{
               padding: '4rem 0',
-              color:
-                'rgba(10, 10, 10, 0.6)',
+              color: 'rgba(10, 10, 10, 0.6)',
               fontSize: '0.875rem',
             }}
           >
@@ -103,13 +81,11 @@ export default function OnSet() {
           <div
             style={{
               padding: '4rem 0',
-              color:
-                'rgba(10, 10, 10, 0.6)',
+              color: 'rgba(10, 10, 10, 0.6)',
               fontSize: '0.875rem',
             }}
           >
-            No behind-the-scenes media
-            has been published yet.
+            No behind-the-scenes media has been published yet.
           </div>
         ) : (
           <MediaSquareGrid

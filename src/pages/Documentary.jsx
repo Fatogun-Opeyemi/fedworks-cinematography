@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
 
+import React, { useEffect, useState } from 'react'
 import SectionHeader from '../components/SectionHeader.jsx'
 import MediaSquareGrid from '../components/media/MediaSquareGrid.jsx'
 import { getProjectsByCategory } from '../libs/sanity.js'
@@ -16,9 +16,9 @@ export default function Documentary() {
             try {
                 const data = await getProjectsByCategory('documentary')
 
-                if (!mounted) return
-
-                setProjects(data || [])
+                if (mounted) {
+                    setProjects(data || [])
+                }
             } catch (error) {
                 console.error('Failed to load documentary projects:', error)
 
@@ -55,17 +55,12 @@ export default function Documentary() {
 
             <section className="selected-work-projects">
                 <div className="site-container">
-                    {loading ? (
-                        <div className="selected-work-loading">
-                            Retrieving documentary work...
-                        </div>
-                    ) : (
-                        <MediaSquareGrid
-                            projects={projects}
-                            showFilters={false}
-                            showCategory={false}
-                        />
-                    )}
+                    <MediaSquareGrid
+                        projects={projects}
+                        showFilters={false}
+                        showCategory={false}
+                        isLoading={loading}
+                    />
                 </div>
             </section>
         </div>

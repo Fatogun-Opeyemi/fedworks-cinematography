@@ -12,7 +12,9 @@ export default function CinematicLoader({ visible = true }) {
         >
             <div className="fw-loader-top">
                 <span className="fw-loader-brand">FEDWORKS</span>
-                <span className="fw-loader-index">INDEPENDENT PICTURE MAKING</span>
+                <span className="fw-loader-index">
+                    INDEPENDENT PICTURE MAKING
+                </span>
             </div>
 
             <div className="fw-loader-center">
@@ -61,13 +63,16 @@ export default function CinematicLoader({ visible = true }) {
           pointer-events: none;
           transition:
             opacity 550ms cubic-bezier(.22, 1, .36, 1),
-            visibility 550ms;
+            visibility 0s linear 550ms;
         }
 
         .fw-cinematic-loader.is-visible {
           opacity: 1;
           visibility: visible;
           pointer-events: auto;
+          transition:
+            opacity 550ms cubic-bezier(.22, 1, .36, 1),
+            visibility 0s;
         }
 
         .fw-loader-top,
@@ -165,6 +170,7 @@ export default function CinematicLoader({ visible = true }) {
           0% {
             transform: translateX(-110%);
           }
+
           100% {
             transform: translateX(390%);
           }

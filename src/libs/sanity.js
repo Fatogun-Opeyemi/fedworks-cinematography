@@ -80,11 +80,25 @@ export async function getProjects() {
 |--------------------------------------------------------------------------
 */
 
+// export async function getFeaturedProjects() {
+//     return client.fetch(
+//         `*[_type == "project" && featured == true] | order(sortOrder asc, year desc, month desc)`
+//     )
+// }
+
+
 export async function getFeaturedProjects() {
     return client.fetch(
-        `*[_type == "project" && featured == true] | order(sortOrder asc, year desc, month desc)`
+        `*[_type == "project" && featured == true]
+      | order(
+          coalesce(featuredSortOrder, sortOrder, 9999) asc,
+          sortOrder asc,
+          year desc,
+          month desc
+        )`
     )
 }
+
 
 /*
 |--------------------------------------------------------------------------

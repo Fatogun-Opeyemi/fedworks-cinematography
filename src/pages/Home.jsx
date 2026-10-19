@@ -84,9 +84,6 @@ export default function Home() {
 
   const heroVideoUrl = siteSettings?.heroVideoUrl || ''
   const heroPosterUrl = siteSettings?.heroPosterUrl || ''
-
-  console.log('Hero video URL:', heroVideoUrl)
-  console.log('Hero poster URL:', heroPosterUrl)
   return (
     <div className="fedworks-home">
       <CinematicLoader visible={isLoading} />
@@ -117,7 +114,7 @@ export default function Home() {
 
             {/* Selected Works Grid */}
             <div className="home-selected-work-grid">
-              {featuredProjects.map((project, index) => (
+              {featuredProjects.slice(0, 6).map((project, index) => (
                 <div
                   key={project._id}
                   className="home-selected-work-item"

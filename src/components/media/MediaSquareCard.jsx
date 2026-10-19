@@ -6,6 +6,7 @@ import VideoPlayer from './VideoPlayer.jsx'
 import MediaViewer from './MediaViewer.jsx'
 
 import {
+  urlFor,
   urlForRect,
   getFileUrl,
   getCategoryLabel,
@@ -32,8 +33,11 @@ export default function MediaSquareCard({
       : project?.slug?.current
 
   /*
-   * Cover media
+   * --------------------------------------------------------------------------
+   * Cover Media
+   * --------------------------------------------------------------------------
    */
+
   const coverMedia = project?.coverMedia || null
 
   const hasVideo =
@@ -56,15 +60,18 @@ export default function MediaSquareCard({
         : ''
 
   /*
-   * Project metadata
+   * --------------------------------------------------------------------------
+   * Project Metadata
+   * --------------------------------------------------------------------------
    */
+
   const categories = Array.isArray(project?.categories)
     ? project.categories
     : []
 
   const isBts = categories.some(
     (category) =>
-      String(category).toLowerCase() === 'bts',
+      String(category).toLowerCase() === 'bts'
   )
 
   const categoryLabel =
@@ -80,8 +87,11 @@ export default function MediaSquareCard({
   )
 
   /*
-   * BTS media viewer
+   * --------------------------------------------------------------------------
+   * BTS Media Viewer
+   * --------------------------------------------------------------------------
    */
+
   const openBtsViewer = () => {
     if (isBts && (videoUrl || posterUrl)) {
       setIsBtsViewerOpen(true)
@@ -89,8 +99,11 @@ export default function MediaSquareCard({
   }
 
   /*
-   * Pause active video when card leaves viewport
+   * --------------------------------------------------------------------------
+   * Pause Active Video When Card Leaves Viewport
+   * --------------------------------------------------------------------------
    */
+
   useEffect(() => {
     if (!hasVideo || !videoActive) return
 
@@ -105,7 +118,9 @@ export default function MediaSquareCard({
           video.pause()
         }
       },
-      { threshold: 0.15 },
+      {
+        threshold: 0.15,
+      },
     )
 
     observer.observe(container)
@@ -113,8 +128,9 @@ export default function MediaSquareCard({
     return () => observer.disconnect()
   }, [hasVideo, videoActive])
 
-  if (!project) return null
-  if (!slug && !isBts) return null
+  if (!project || !slug) {
+    return null
+  }
 
   const activateVideo = () => {
     if (!videoUrl) return
@@ -128,8 +144,11 @@ export default function MediaSquareCard({
   }
 
   /*
-   * Media content
+   * --------------------------------------------------------------------------
+   * Media Content
+   * --------------------------------------------------------------------------
    */
+
   let mediaContent
 
   if (hasVideo && videoUrl) {
@@ -174,7 +193,9 @@ export default function MediaSquareCard({
             />
           ) : (
             <span className="square-image-placeholder">
-              <span>{project.title || 'Project'}</span>
+              <span>
+                {project.title || 'Project'}
+              </span>
             </span>
           )}
 
@@ -245,7 +266,9 @@ export default function MediaSquareCard({
     if (isBts) {
       mediaContent = (
         <div className="square-image-placeholder">
-          <span>{project.title || 'Project'}</span>
+          <span>
+            {project.title || 'Project'}
+          </span>
         </div>
       )
     } else {
@@ -255,45 +278,22 @@ export default function MediaSquareCard({
           className="square-image-placeholder"
           aria-label={`View ${project.title || 'project'}`}
         >
-          <span>{project.title || 'Project'}</span>
+          <span>
+            {project.title || 'Project'}
+          </span>
         </Link>
       )
     }
   }
 
   /*
+   * --------------------------------------------------------------------------
    * Render
+   * --------------------------------------------------------------------------
    */
+
   return (
     <>
-      <style>{`
-        .bts-media-trigger {
-          display: block;
-          width: 100%;
-          padding: 0;
-          border: 0;
-          background: transparent;
-          color: inherit;
-          cursor: pointer;
-          text-align: inherit;
-          font: inherit;
-          appearance: none;
-          -webkit-appearance: none;
-        }
-
-        .bts-media-trigger img {
-          display: block;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .bts-media-trigger:focus-visible {
-          outline: 2px solid currentColor;
-          outline-offset: 4px;
-        }
-      `}</style>
-
       <Reveal delay={delay}>
         <article
           ref={containerRef}
@@ -348,13 +348,17 @@ export default function MediaSquareCard({
                       )}
 
                     {project.clientOrArtist && (
-                      <span>{project.clientOrArtist}</span>
+                      <span>
+                        {project.clientOrArtist}
+                      </span>
                     )}
                   </div>
 
                   <div className="square-project-subline tabular-nums">
                     {project.location && (
-                      <span>{project.location}</span>
+                      <span>
+                        {project.location}
+                      </span>
                     )}
 
                     {project.location &&
@@ -365,7 +369,9 @@ export default function MediaSquareCard({
                       )}
 
                     {dateFormatted && (
-                      <span>{dateFormatted}</span>
+                      <span>
+                        {dateFormatted}
+                      </span>
                     )}
                   </div>
                 </>
@@ -388,5 +394,12 @@ export default function MediaSquareCard({
         />
       )}
     </>
+
+
   )
+
+
+
+
+
 }

@@ -221,14 +221,63 @@ export default function About() {
    * ============================================================
    */
 
+
   if (loading) {
     return (
       <main className="about-page">
-        <div className="site-container">
-          <div className="about-loading">
+        <div className="site-container about-loading-skeleton">
+          <div className="about-section-marker about-section-marker-horizontal">
             <span>01 / 06</span>
             <span>ABOUT</span>
           </div>
+
+          <div className="about-portrait-wrap">
+            <div
+              className="about-skeleton about-skeleton-portrait"
+              aria-hidden="true"
+            />
+
+            <div className="about-skeleton-caption">
+              <span className="about-skeleton" />
+              <span className="about-skeleton" />
+            </div>
+          </div>
+
+          <section
+            className="about-skeleton-section"
+            aria-label="Loading biography"
+            aria-busy="true"
+          >
+            <div className="about-section-marker">
+              <span>02 / 06</span>
+              <span>BIOGRAPHY</span>
+            </div>
+
+            <div className="about-editorial-content">
+              {[100, 100, 78, 100, 48].map((width, index) => (
+                <div
+                  key={index}
+                  className="about-skeleton about-skeleton-line"
+                  style={{ width: `${width}%` }}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="about-skeleton-section">
+            <div className="about-section-marker">
+              <span>03 / 06</span>
+              <span>PRESS &amp; PUBLICATIONS</span>
+            </div>
+
+            {[1, 2, 3].map((item) => (
+              <div
+                key={item}
+                className="about-skeleton about-skeleton-line"
+                style={{ width: `${100 - item * 12}%` }}
+              />
+            ))}
+          </section>
         </div>
       </main>
     )

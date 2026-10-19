@@ -177,11 +177,12 @@ video {
   display: block;
 
   font-size: 1.125rem;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.1;
 
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  word-spacing: normal;
 
   color: var(--color-black);
 }
@@ -1013,7 +1014,7 @@ video {
    ========================================================================== */
 
 .section-header {
-  margin-bottom: clamp(1.75rem, 3.5vw, 3rem);
+  margin-bottom: 1.5rem;
 }
 
 .section-kicker {
@@ -1043,15 +1044,11 @@ video {
 }
 
 .section-title {
-  font-size: clamp(2rem, 4.5vw, 3.75rem);
-  font-weight: 500;
-
-  line-height: 1.08;
-
-  letter-spacing: -0.025em;
-
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
   color: var(--color-black);
-
   text-wrap: balance;
 }
 
@@ -1680,7 +1677,7 @@ video {
 
   margin-top: 0.5rem;
 
-  font-weight: 700;
+  font-weight: 500;
 
   letter-spacing: 0.02em;
 
@@ -1691,9 +1688,11 @@ video {
   transition: color 0.2s ease;
 }
 
-.media-square-card:hover .square-project-title {
+
+
+/* .media-square-card:hover .square-project-title {
   color: var(--color-red);
-}
+} */
 
 .square-project-line,
 .square-project-subline {

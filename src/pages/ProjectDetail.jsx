@@ -289,8 +289,7 @@ export default function ProjectDetail() {
           <div
             className="project-detail-primary"
             style={{
-              marginTop: '3rem',
-              marginBottom: '5rem',
+              marginBottom: '5rem'
             }}
           >
             <div className="project-detail-primary-media">
@@ -505,7 +504,7 @@ export default function ProjectDetail() {
                 style={{
                   fontSize:
                     'clamp(1.5rem, 3vw, 2.5rem)',
-                  fontWeight: 700,
+                  fontWeight: 500,
                   color: 'var(--color-black)',
                   display: 'inline-flex',
                   alignItems: 'center',

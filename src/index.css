@@ -402,6 +402,8 @@ video {
   color: var(--color-black);
 }
 
+
+
 .section-subtitle {
   font-size: clamp(1rem, 1.25vw, 1.15rem);
   font-weight: 300;
