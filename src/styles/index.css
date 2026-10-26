@@ -1307,10 +1307,10 @@ video {
 
   border: 1px solid rgba(243, 240, 232, 0.28);
 
-  background-color: rgba(10, 10, 10, 0.42);
+  /* background-color: rgba(10, 10, 10, 0.42); */
 
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  /* -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px); */
 
   transition:
     background-color 0.2s cubic-bezier(0.22, 1, 0.36, 1),

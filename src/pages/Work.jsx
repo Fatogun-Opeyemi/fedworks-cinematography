@@ -47,7 +47,7 @@ export default function Work() {
             <SectionHeader title="Selected works" />
 
             <Link to="/" className="mobile-back-home">
-              ← Back Home
+              ←  Back Home
             </Link>
           </div>
         </div>

@@ -189,7 +189,6 @@ export default function HeroReel({
     justify-content: center;
     gap: 8px;
     border: 0;
-    background: transparent;
     color: #F2F0EB;
     font: inherit;
     font-size: 0.72rem;

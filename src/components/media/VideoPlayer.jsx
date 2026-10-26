@@ -304,8 +304,32 @@ const VideoPlayer = forwardRef(function VideoPlayer(
     setIsLoaded(false)
   }, [])
 
+  // const handleErrorEvent = useCallback(
+  //   (event) => {
+  //     setHasError(true)
+  //     setIsPlaying(false)
+  //     setIsLoaded(false)
+  //     setShowControls(true)
+
+  //     onError?.(event)
+  //   },
+  //   [onError],
+  // )
+
   const handleErrorEvent = useCallback(
     (event) => {
+      const video = event.currentTarget
+      const error = video.error
+
+      console.error('[FEDWORKS] Video playback failed', {
+        title,
+        src: video.currentSrc || video.src,
+        code: error?.code,
+        message: error?.message || 'No browser error message',
+        networkState: video.networkState,
+        readyState: video.readyState,
+      })
+
       setHasError(true)
       setIsPlaying(false)
       setIsLoaded(false)
@@ -313,7 +337,7 @@ const VideoPlayer = forwardRef(function VideoPlayer(
 
       onError?.(event)
     },
-    [onError],
+    [onError, title],
   )
 
   /*
