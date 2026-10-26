@@ -195,6 +195,7 @@ export async function getSiteSettings() {
     }
 }
 
+
 export async function getAboutContent() {
     const about = await client.fetch(
         `*[_type == "about"][0]`
@@ -206,6 +207,10 @@ export async function getAboutContent() {
 
     return {
         ...about,
+
+        cvUrl: about.cv
+            ? getFileUrl(about.cv) || ''
+            : '',
 
         portraitImageUrl: about.portrait
             ? urlFor(about.portrait)?.url()
@@ -219,6 +224,7 @@ export async function getAboutContent() {
             : [],
     }
 }
+
 
 export async function getMentoringContent() {
     return client.fetch(

@@ -183,6 +183,8 @@ export default function About() {
     : []
 
   const cvUrl = about?.cvUrl || ''
+  console.log('About document:', about)
+  console.log('CV URL:', cvUrl)
 
   const contactEmail =
     siteSettings?.contactEmail || ''
@@ -456,7 +458,7 @@ export default function About() {
                   )
                 ) : (
                   <div className="about-empty">
-                    Press and publications coming soon.
+                    {/* Press and publications coming soon. */}
                   </div>
                 )}
 
@@ -1127,8 +1129,8 @@ export default function About() {
                           </a>
 
                           <a
-                            href={cvUrl}
-                            download
+                            href={`${cvUrl}${cvUrl.includes('?') ? '&' : '?'}dl=CV.pdf`}
+                            target="_blank"
                             style={{
                               color:
                                 'var(--color-black)',
