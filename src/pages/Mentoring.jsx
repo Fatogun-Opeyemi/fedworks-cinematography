@@ -6,8 +6,8 @@ import Reveal from '../components/Reveal.jsx'
 const EMAILJS_SERVICE_ID =
   import.meta.env.VITE_EMAILJS_SERVICE_ID
 
-const EMAILJS_TEMPLATE_ID =
-  import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EMAILJS_MENTORING_TEMPLATE_ID =
+  import.meta.env.VITE_EMAILJS_MENTORING_TEMPLATE_ID
 
 const EMAILJS_PUBLIC_KEY =
   import.meta.env.VITE_EMAILJS_PUBLIC_KEY
@@ -108,8 +108,7 @@ export default function Mentoring() {
       return
     }
 
-    const emailPattern =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     if (!emailPattern.test(email)) {
       setStatus('error')
@@ -129,7 +128,7 @@ export default function Mentoring() {
 
       await emailjs.sendForm(
         EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
+        EMAILJS_MENTORING_TEMPLATE_ID,
         formRef.current,
       )
 
