@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../Reveal.jsx'
 import VideoPlayer from './VideoPlayer.jsx'
-import MediaViewer from './MediaViewer.jsx'
+// import MediaViewer from './MediaViewer.jsx'
 
 import {
   urlFor,
@@ -20,44 +20,18 @@ export default function MediaSquareCard({
   showOnlyTitle = false,
   showCategory = true,
   showMetadata = true,
+  onBtsMediaClick
 }) {
   const containerRef = useRef(null)
   const videoRef = useRef(null)
 
   const [videoActive, setVideoActive] = useState(false)
-  const [isBtsViewerOpen, setIsBtsViewerOpen] = useState(false)
+  // const [isBtsViewerOpen, setIsBtsViewerOpen] = useState(false)
 
   const slug =
     typeof project?.slug === 'string'
       ? project.slug
       : project?.slug?.current
-
-  /*
-   * --------------------------------------------------------------------------
-   * Cover Media
-   * --------------------------------------------------------------------------
-   */
-
-  const coverMedia = project?.coverMedia || null
-
-  const hasVideo =
-    coverMedia?.type === 'video' &&
-    Boolean(coverMedia?.video)
-
-  const videoUrl = hasVideo
-    ? getFileUrl(coverMedia.video)
-    : null
-
-  const posterUrl =
-    coverMedia?.type === 'video'
-      ? coverMedia?.poster
-        ? urlForRect(coverMedia.poster)
-        : ''
-      : coverMedia?.type === 'image'
-        ? coverMedia?.image
-          ? urlForRect(coverMedia.image)
-          : ''
-        : ''
 
   /*
    * --------------------------------------------------------------------------
@@ -70,8 +44,7 @@ export default function MediaSquareCard({
     : []
 
   const isBts = categories.some(
-    (category) =>
-      String(category).toLowerCase() === 'bts'
+    (category) => String(category).toLowerCase() === 'bts'
   )
 
   const categoryLabel =
@@ -88,16 +61,51 @@ export default function MediaSquareCard({
 
   /*
    * --------------------------------------------------------------------------
+   * Cover Media
+   * --------------------------------------------------------------------------
+   */
+
+  const coverMedia = project?.coverMedia || null
+
+  const hasVideo =
+    coverMedia?.type === 'video' &&
+    Boolean(coverMedia?.video)
+
+  const isBtsImage =
+    isBts &&
+    coverMedia?.type === 'image' &&
+    Boolean(coverMedia?.image)
+
+  const videoUrl = hasVideo
+    ? getFileUrl(coverMedia.video)
+    : null
+
+  const posterSource =
+    coverMedia?.type === 'video'
+      ? coverMedia?.poster
+      : coverMedia?.type === 'image'
+        ? coverMedia?.image
+        : null
+
+  // BTS images use the original image proportions.
+  // Other project images retain the existing rectangular crop.
+  const posterUrl = posterSource
+    ? isBtsImage
+      ? urlFor(posterSource).quality(90).auto('format').url()
+      : urlForRect(posterSource)
+    : ''
+
+  /*
+   * --------------------------------------------------------------------------
    * BTS Media Viewer
    * --------------------------------------------------------------------------
    */
 
   const openBtsViewer = () => {
-    if (isBts && (videoUrl || posterUrl)) {
-      setIsBtsViewerOpen(true)
-    }
-  }
+    if (!isBts || (!videoUrl && !posterUrl)) return
 
+    onBtsMediaClick?.(project)
+  }
   /*
    * --------------------------------------------------------------------------
    * Pause Active Video When Card Leaves Viewport
@@ -142,6 +150,35 @@ export default function MediaSquareCard({
 
     setVideoActive(true)
   }
+
+  /*
+   * --------------------------------------------------------------------------
+   * BTS Image Presentation
+   * --------------------------------------------------------------------------
+   */
+
+  const btsImageStyle = isBtsImage
+    ? {
+      display: 'block',
+      width: '100%',
+      height: 'auto',
+      aspectRatio: 'auto',
+      objectFit: 'contain',
+    }
+    : undefined
+
+  const btsImageButtonStyle = isBtsImage
+    ? {
+      display: 'block',
+      width: '100%',
+      height: 'auto',
+      aspectRatio: 'auto',
+      overflow: 'visible',
+      padding: 0,
+      border: 0,
+      background: 'transparent',
+    }
+    : undefined
 
   /*
    * --------------------------------------------------------------------------
@@ -223,6 +260,7 @@ export default function MediaSquareCard({
         <button
           type="button"
           className="square-image-link bts-media-trigger"
+          style={btsImageButtonStyle}
           onClick={openBtsViewer}
           aria-label={`View ${project.title || 'BTS media'}`}
         >
@@ -237,6 +275,7 @@ export default function MediaSquareCard({
             decoding="async"
             referrerPolicy="no-referrer"
             className="square-media-asset"
+            style={btsImageStyle}
           />
         </button>
       )
@@ -299,7 +338,18 @@ export default function MediaSquareCard({
           ref={containerRef}
           className="media-square-card"
         >
-          <div className="square-media-box">
+          <div
+            className="square-media-box"
+            style={
+              isBtsImage
+                ? {
+                  height: 'auto',
+                  aspectRatio: 'auto',
+                  overflow: 'visible',
+                }
+                : undefined
+            }
+          >
             {mediaContent}
 
             {showMetadata &&
@@ -381,7 +431,7 @@ export default function MediaSquareCard({
         </article>
       </Reveal>
 
-      {isBts && (
+      {/* {isBts && (
         <MediaViewer
           isOpen={isBtsViewerOpen}
           onClose={() => setIsBtsViewerOpen(false)}
@@ -392,14 +442,7 @@ export default function MediaSquareCard({
           caption="Behind the scenes"
           showControls={hasVideo}
         />
-      )}
+      )} */}
     </>
-
-
   )
-
-
-
-
-
 }

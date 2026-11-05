@@ -9,7 +9,7 @@ import MediaViewer from '../components/media/MediaViewer.jsx'
 
 import {
   getProjectBySlug,
-  getProjects,
+  getFeaturedProjects,
   urlFor,
   getFileUrl,
   getCategoryLabel,
@@ -31,9 +31,9 @@ export default function ProjectDetail() {
 
     async function loadProject() {
       try {
-        const [current, all] = await Promise.all([
+        const [current, featured] = await Promise.all([
           getProjectBySlug(slug),
-          getProjects(),
+          getFeaturedProjects(),
         ])
 
         if (!mounted) return
@@ -42,10 +42,10 @@ export default function ProjectDetail() {
 
         if (
           current &&
-          Array.isArray(all) &&
-          all.length > 1
+          Array.isArray(featured) &&
+          featured.length > 1
         ) {
-          const sorted = [...all].sort(
+          const sorted = [...featured].sort(
             (a, b) =>
               (a.sortOrder ?? 99) -
               (b.sortOrder ?? 99),
@@ -57,9 +57,7 @@ export default function ProjectDetail() {
 
           if (currentIndex !== -1) {
             const next =
-              sorted[
-              (currentIndex + 1) % sorted.length
-              ]
+              sorted[(currentIndex + 1) % sorted.length]
 
             setNextProject(next)
           } else {
@@ -69,10 +67,7 @@ export default function ProjectDetail() {
           setNextProject(null)
         }
       } catch (error) {
-        console.error(
-          'Failed to load project:',
-          error,
-        )
+        console.error('Failed to load project:', error)
 
         if (!mounted) return
 

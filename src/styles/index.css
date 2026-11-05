@@ -1513,6 +1513,78 @@ video {
   outline-offset: -2px;
 }
 
+/* BTS masonry layout */
+.square-media-grid.square-media-grid--masonry {
+  display: block;
+  column-count: 1;
+  column-gap: 10px;
+  width: 100%;
+}
+
+/* Keep each card together inside its column */
+.square-media-grid--masonry>* {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 10px;
+  vertical-align: top;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.square-media-grid--masonry .media-square-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  break-inside: avoid;
+}
+
+/* Remove the fixed 3:2 thumbnail frame for BTS */
+.square-media-grid--masonry .square-media-box {
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  overflow: visible;
+  background: transparent;
+}
+
+/* Let the BTS image determine its own height */
+.square-media-grid--masonry .bts-media-trigger {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 0;
+  cursor: pointer;
+}
+
+.square-media-grid--masonry .bts-media-trigger .square-media-asset {
+  position: static;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .square-media-grid.square-media-grid--masonry {
+    column-count: 2;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .square-media-grid.square-media-grid--masonry {
+    column-count: 3;
+  }
+}
+
 /* ==========================================================================
    MEDIA CONTROLS
    ========================================================================== */
