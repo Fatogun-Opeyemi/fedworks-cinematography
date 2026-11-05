@@ -17,13 +17,31 @@ export default function MediaImage({
   const [isLoaded, setIsLoaded] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const transformedImageUrl = image
-    ? urlFor(image)
-      ?.width(width)
+  const imageBuilder = image ? urlFor(image) : null
+
+  const transformedImageUrl = imageBuilder
+    ? imageBuilder
+      .width(width)
       .quality(quality)
       .auto('format')
       .url()
     : ''
+
+  const responsiveWidths = [480, 768, 1200, 1600, 2000]
+
+  const responsiveSrcSet =
+    imageBuilder && !src
+      ? responsiveWidths
+        .map(
+          (imageWidth) =>
+            `${urlFor(image)
+              .width(imageWidth)
+              .quality(quality)
+              .auto('format')
+              .url()} ${imageWidth}w`,
+        )
+        .join(', ')
+      : undefined
 
   const resolvedSrc =
     src ||
@@ -44,6 +62,7 @@ export default function MediaImage({
       {!hasError && (
         <img
           src={resolvedSrc}
+          srcSet={responsiveSrcSet}
           alt={alt}
           loading={priority ? 'eager' : loading}
           decoding="async"

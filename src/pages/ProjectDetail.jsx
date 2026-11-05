@@ -211,6 +211,7 @@ export default function ProjectDetail() {
       .filter(
         (item) =>
           item?.type === 'image' &&
+          item?.role === 'main' &&
           item?.image,
       )
       .sort(

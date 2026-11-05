@@ -27,19 +27,97 @@ export function urlFor(source) {
 
 /*
 |--------------------------------------------------------------------------
+| Optimized Image URL
+|--------------------------------------------------------------------------
+|
+| Generates responsive image URLs through Sanity's CDN.
+| The original asset remains unchanged in Sanity.
+|
+| width: Maximum requested image width.
+| quality: Image quality from 1–100.
+| auto('format'): Allows the CDN to serve an efficient format
+| such as WebP or AVIF when supported by the browser.
+|
+|--------------------------------------------------------------------------
+*/
+
+export function urlForOptimized(source, width = 1600, quality = 85) {
+    if (!source) {
+        return null
+    }
+
+    return imageBuilder
+        .image(source)
+        .width(width)
+        .quality(quality)
+        .auto('format')
+        .url()
+}
+
+/*
+|--------------------------------------------------------------------------
+| High Resolution Image URL
+|--------------------------------------------------------------------------
+|
+| Use when a visitor opens an image in the lightbox.
+| This requests a larger rendition without forcing the browser
+| to download the original 20 MB asset.
+|
+|--------------------------------------------------------------------------
+*/
+
+export function urlForHighResolution(source, quality = 90) {
+    if (!source) {
+        return null
+    }
+
+    return imageBuilder
+        .image(source)
+        .width(3000)
+        .quality(quality)
+        .auto('format')
+        .url()
+}
+
+/*
+|--------------------------------------------------------------------------
+| Original Image Asset URL
+|--------------------------------------------------------------------------
+|
+| Returns the original Sanity image asset URL without image
+| transformations. Useful when offering an actual original download.
+|
+|--------------------------------------------------------------------------
+*/
+
+export function urlForOriginal(source) {
+    const reference = source?.asset?._ref
+
+    if (!reference) {
+        return null
+    }
+
+    const match = reference.match(/^image-(.+)-([^-]+)$/)
+
+    if (!match) {
+        return null
+    }
+
+    const [, assetId, extension] = match
+
+    const { projectId, dataset } = client.config()
+
+    return `https://cdn.sanity.io/images/${projectId}/${dataset}/${assetId}.${extension}`
+}
+
+/*
+|--------------------------------------------------------------------------
 | Sanity File URL Helper
 |--------------------------------------------------------------------------
 |
 | Sanity file asset references look like:
 |
 | file-<asset-id>-<extension>
-|
-| Example:
-|
-| file-abc12345-....-mp4
-|
-| The asset ID itself can contain hyphens, so the expression below
-| separates the final extension from the complete asset ID.
 |
 |--------------------------------------------------------------------------
 */
@@ -59,7 +137,9 @@ export function getFileUrl(file) {
 
     const [, assetId, extension] = match
 
-    return `https://cdn.sanity.io/files/${client.config().projectId}/${client.config().dataset}/${assetId}.${extension}`
+    const { projectId, dataset } = client.config()
+
+    return `https://cdn.sanity.io/files/${projectId}/${dataset}/${assetId}.${extension}`
 }
 
 /*
@@ -80,25 +160,17 @@ export async function getProjects() {
 |--------------------------------------------------------------------------
 */
 
-// export async function getFeaturedProjects() {
-//     return client.fetch(
-//         `*[_type == "project" && featured == true] | order(sortOrder asc, year desc, month desc)`
-//     )
-// }
-
-
 export async function getFeaturedProjects() {
     return client.fetch(
         `*[_type == "project" && featured == true]
-      | order(
-          coalesce(featuredSortOrder, sortOrder, 9999) asc,
-          sortOrder asc,
-          year desc,
-          month desc
+        | order(
+            coalesce(featuredSortOrder, sortOrder, 9999) asc,
+            sortOrder asc,
+            year desc,
+            month desc
         )`
     )
 }
-
 
 /*
 |--------------------------------------------------------------------------
@@ -108,7 +180,8 @@ export async function getFeaturedProjects() {
 
 export async function getProjectsByCategory(category) {
     return client.fetch(
-        `*[_type == "project" && $category in categories] | order(sortOrder asc, year desc, month desc)`,
+        `*[_type == "project" && $category in categories]
+        | order(sortOrder asc, year desc, month desc)`,
         { category }
     )
 }
@@ -173,6 +246,13 @@ export const categoryLabels = {
 export function getCategoryLabel(category) {
     return categoryLabels[category] || category
 }
+
+/*
+|--------------------------------------------------------------------------
+| Site Settings
+|--------------------------------------------------------------------------
+*/
+
 export async function getSiteSettings() {
     const settings = await client.fetch(
         `*[_type == "siteSettings"][0]`
@@ -190,11 +270,16 @@ export async function getSiteSettings() {
             : '',
 
         heroPosterUrl: settings.showreelPoster
-            ? urlFor(settings.showreelPoster)?.url()
+            ? urlForOptimized(settings.showreelPoster, 2000, 90)
             : '',
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| About Content
+|--------------------------------------------------------------------------
+*/
 
 export async function getAboutContent() {
     const about = await client.fetch(
@@ -213,24 +298,35 @@ export async function getAboutContent() {
             : '',
 
         portraitImageUrl: about.portrait
-            ? urlFor(about.portrait)?.url()
+            ? urlForOptimized(about.portrait, 1600, 90)
             : '',
 
         supportingImages: Array.isArray(about.supportingImages)
             ? about.supportingImages.map((image) => ({
                 ...image,
-                url: urlFor(image)?.url() || '',
+                url: urlForOptimized(image, 1600, 85) || '',
             }))
             : [],
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Mentoring Content
+|--------------------------------------------------------------------------
+*/
 
 export async function getMentoringContent() {
     return client.fetch(
         `*[_type == "mentoring"][0]`
     )
 }
+
+/*
+|--------------------------------------------------------------------------
+| Square Image Helper
+|--------------------------------------------------------------------------
+*/
 
 export function urlForSquare(source, width = 800) {
     if (!source) {
@@ -242,8 +338,16 @@ export function urlForSquare(source, width = 800) {
         .width(width)
         .height(width)
         .fit('crop')
+        .quality(85)
+        .auto('format')
         .url()
 }
+
+/*
+|--------------------------------------------------------------------------
+| Rectangular Image Helper
+|--------------------------------------------------------------------------
+*/
 
 export function urlForRect(source, width = 1200) {
     if (!source) {
@@ -257,5 +361,49 @@ export function urlForRect(source, width = 1200) {
         .width(width)
         .height(height)
         .fit('crop')
+        .quality(85)
+        .auto('format')
         .url()
+}
+
+export async function getBtsMedia() {
+    const query = `*[
+    _type == "project" &&
+    count(
+      media[
+        type == "image" &&
+        role == "bts" &&
+        defined(image)
+      ]
+    ) > 0
+  ] | order(year desc) {
+    _id,
+    title,
+    year,
+    month,
+    "btsMedia": media[
+      type == "image" &&
+      role == "bts" &&
+      defined(image)
+    ] {
+      _key,
+      image,
+      caption,
+      alt,
+      order
+    }
+  }`
+
+    const projects = await client.fetch(query)
+
+    return (projects || []).flatMap((project) =>
+        [...(project.btsMedia || [])]
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map((item) => ({
+                ...item,
+                projectId: project._id,
+                projectTitle: project.title,
+                projectYear: project.year,
+            })),
+    )
 }

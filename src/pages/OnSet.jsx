@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import SectionHeader from '../components/SectionHeader.jsx'
 import MediaSquareGrid from '../components/media/MediaSquareGrid.jsx'
-import { getProjectsByCategory } from '../libs/sanity.js'
+import { getBtsMedia, urlFor, getProjectsByCategory } from '../libs/sanity.js'
+import MediaViewer from '../components/media/MediaViewer.jsx'
+// import { getProjectsByCategory } from '../libs/sanity.js'
 import { Link } from 'react-router-dom'
 
 export default function OnSet() {
@@ -41,6 +43,9 @@ export default function OnSet() {
       mounted = false
     }
   }, [])
+
+  console.log(btsItems);
+
 
   return (
     <div
