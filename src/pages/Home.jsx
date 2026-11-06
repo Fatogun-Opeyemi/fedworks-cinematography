@@ -84,20 +84,15 @@ export default function Home() {
 
   const heroVideoUrl = siteSettings?.heroVideoUrl || ''
   const heroPosterUrl = siteSettings?.heroPosterUrl || ''
+  const showreelVideoUrl = siteSettings?.showreelVideoUrl || ''
+  const showreelPosterUrl = siteSettings?.showreelPosterUrl || ''
   return (
     <div className="fedworks-home">
       <CinematicLoader visible={isLoading} />
 
       {/* HERO */}
-      <HeroReel
-        videoSrc={heroVideoUrl}
-        posterSrc={heroPosterUrl}
-        onWatchReel={
-          heroVideoUrl
-            ? () => setIsViewerOpen(true)
-            : undefined
-        }
-      />
+      <HeroReel videoSrc={heroVideoUrl} posterSrc={heroPosterUrl} onWatchReel={showreelVideoUrl ? () => setIsViewerOpen(true) : undefined} />
+
 
       {/* SELECTED WORKS */}
       {featuredProjects.length > 0 && (
@@ -138,8 +133,8 @@ export default function Home() {
           isOpen={isViewerOpen}
           onClose={() => setIsViewerOpen(false)}
           mediaType="video"
-          mediaSrc={heroVideoUrl}
-          posterSrc={heroPosterUrl}
+          mediaSrc={showreelVideoUrl}
+          posterSrc={showreelPosterUrl}
           title="Chukwuka Edeogu Showreel"
           caption="Portfolio reel"
           showControls={false}

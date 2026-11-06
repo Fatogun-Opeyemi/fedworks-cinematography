@@ -253,6 +253,29 @@ export function getCategoryLabel(category) {
 |--------------------------------------------------------------------------
 */
 
+// export async function getSiteSettings() {
+//     const settings = await client.fetch(
+//         `*[_type == "siteSettings"][0]`
+//     )
+
+//     if (!settings) {
+//         return null
+//     }
+
+//     return {
+//         ...settings,
+
+//         heroVideoUrl: settings.showreelVideo
+//             ? getFileUrl(settings.showreelVideo)
+//             : '',
+
+//         heroPosterUrl: settings.showreelPoster
+//             ? urlForOptimized(settings.showreelPoster, 2000, 90)
+//             : '',
+//     }
+// }
+
+
 export async function getSiteSettings() {
     const settings = await client.fetch(
         `*[_type == "siteSettings"][0]`
@@ -265,16 +288,31 @@ export async function getSiteSettings() {
     return {
         ...settings,
 
-        heroVideoUrl: settings.showreelVideo
+        // LANDING HERO
+        // Falls back to showreel* until you upload heroVideo/heroPoster.
+        heroVideoUrl: settings.heroVideo
+            ? getFileUrl(settings.heroVideo)
+            : settings.showreelVideo
+                ? getFileUrl(settings.showreelVideo)
+                : '',
+
+        heroPosterUrl: settings.heroPoster
+            ? urlForOptimized(settings.heroPoster, 2000, 90)
+            : settings.showreelPoster
+                ? urlForOptimized(settings.showreelPoster, 2000, 90)
+                : '',
+
+        // INNER SHOWREEL
+        // Reads ONLY the showreel* fields — never falls back to hero.
+        showreelVideoUrl: settings.showreelVideo
             ? getFileUrl(settings.showreelVideo)
             : '',
 
-        heroPosterUrl: settings.showreelPoster
+        showreelPosterUrl: settings.showreelPoster
             ? urlForOptimized(settings.showreelPoster, 2000, 90)
             : '',
     }
 }
-
 /*
 |--------------------------------------------------------------------------
 | About Content
